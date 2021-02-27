@@ -17,7 +17,7 @@ sudo snap install sqlc
 ## go get
 
 ```
-go get github.com/kyleconroy/sqlc/cmd/sqlc
+go get github.com/xiazemin/sqlc/cmd/sqlc
 ```
 
 ## Docker
@@ -36,7 +36,7 @@ docker run --rm -v $(pwd):/src -w /src kjconroy/sqlc generate
 
 Binaries for a given release can be downloaded from the [stable channel on
 Equinox](https://dl.equinox.io/sqlc/sqlc/stable) or the latest [GitHub
-release](https://github.com/kyleconroy/sqlc/releases).
+release](https://github.com/xiazemin/sqlc/releases).
 
 ## Tip Releases
 

@@ -10,8 +10,9 @@ import (
 	driver "github.com/pingcap/parser/test_driver"
 	"github.com/pingcap/parser/types"
 
-	"github.com/kyleconroy/sqlc/internal/debug"
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/debug"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 type cc struct {
@@ -19,7 +20,7 @@ type cc struct {
 }
 
 func todo(n pcast.Node) *ast.TODO {
-	if debug.Active {
+	if debug.Active || true {
 		log.Printf("dolphin.convert: Unknown node type %T\n", n)
 	}
 	return &ast.TODO{}
@@ -139,7 +140,8 @@ func opToName(o opcode.Op) string {
 		return ">="
 	case opcode.GT:
 		return ">"
-		// case opcode.In:
+	case opcode.In:
+		return "xiazeminIn"
 	case opcode.IntDiv:
 		return "/"
 	// case opcode.IsFalsity:
@@ -416,6 +418,7 @@ func (c *cc) convertLists(lists [][]pcast.ExprNode) *ast.List {
 func (c *cc) convertParamMarkerExpr(n *driver.ParamMarkerExpr) *ast.ParamRef {
 	// Parameter numbers start at one
 	c.paramCount += 1
+	util.Xiazeminlog(n)
 	return &ast.ParamRef{
 		Number:   c.paramCount,
 		Location: n.Offset,
@@ -447,6 +450,7 @@ func (c *cc) convertSelectStmt(n *pcast.SelectStmt) *ast.SelectStmt {
 		FromClause:  c.convertTableRefsClause(n.From),
 		WhereClause: c.convert(n.Where),
 	}
+
 	if n.Limit != nil {
 		stmt.LimitCount = c.convert(n.Limit.Count)
 		stmt.LimitOffset = c.convert(n.Limit.Offset)
@@ -484,6 +488,13 @@ func (c *cc) convertUpdateStmt(n *pcast.UpdateStmt) *ast.UpdateStmt {
 
 	case *ast.RangeVar:
 		rangeVar = rel
+	case *ast.In:
+		/*left, ok := rel.Expr.(*ast.RangeVar)
+		if !ok {
+			panic("expected range var")
+		}
+		rangeVar=left
+		*/
 
 	default:
 		panic("expected range var")
@@ -870,7 +881,25 @@ func (c *cc) convertPartitionByClause(n *pcast.PartitionByClause) ast.Node {
 }
 
 func (c *cc) convertPatternInExpr(n *pcast.PatternInExpr) ast.Node {
-	return todo(n)
+	if n == nil {
+		return &ast.In{
+			TypeName: "XiazeminInExprNull",
+		}
+	}
+
+	l := make([]ast.Node, 0, len(n.List))
+	for _, node := range n.List {
+		lele := c.convert(node)
+		l = append(l, lele)
+	}
+
+	return &ast.In{
+		Expr:     c.convert(n.Expr),
+		List:     l,
+		Not:      n.Not,
+		Sel:      c.convert(n.Sel),
+		TypeName: "XiazeminInExpr",
+	}
 }
 
 func (c *cc) convertPatternLikeExpr(n *pcast.PatternLikeExpr) ast.Node {
@@ -1074,12 +1103,14 @@ func (c *cc) convertWindowSpec(n *pcast.WindowSpec) ast.Node {
 
 func (c *cc) convert(node pcast.Node) ast.Node {
 	switch n := node.(type) {
-
 	case *driver.ParamMarkerExpr:
 		return c.convertParamMarkerExpr(n)
 
 	case *driver.ValueExpr:
 		return c.convertValueExpr(n)
+
+	case *pcast.PatternInExpr:
+		return c.convertPatternInExpr(n)
 
 	case *pcast.AdminStmt:
 		return c.convertAdminStmt(n)
@@ -1327,9 +1358,6 @@ func (c *cc) convert(node pcast.Node) ast.Node {
 	case *pcast.PartitionByClause:
 		return c.convertPartitionByClause(n)
 
-	case *pcast.PatternInExpr:
-		return c.convertPatternInExpr(n)
-
 	case *pcast.PatternLikeExpr:
 		return c.convertPatternLikeExpr(n)
 
@@ -1376,6 +1404,7 @@ func (c *cc) convert(node pcast.Node) ast.Node {
 		return c.convertSelectField(n)
 
 	case *pcast.SelectStmt:
+		//util.Xiazeminlog(n)
 		return c.convertSelectStmt(n)
 
 	case *pcast.SetCollationExpr:
@@ -1476,7 +1505,6 @@ func (c *cc) convert(node pcast.Node) ast.Node {
 
 	case *pcast.WindowSpec:
 		return c.convertWindowSpec(n)
-
 	case nil:
 		return nil
 

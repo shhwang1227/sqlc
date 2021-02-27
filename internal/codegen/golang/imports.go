@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/kyleconroy/sqlc/internal/config"
-	"github.com/kyleconroy/sqlc/internal/metadata"
+	"github.com/xiazemin/sqlc/internal/config"
+	"github.com/xiazemin/sqlc/internal/metadata"
 )
 
 type fileImports struct {
@@ -338,6 +338,9 @@ func (i *importer) queryImports(filename string) fileImports {
 	for _, q := range gq {
 		if q.Cmd == metadata.CmdExecResult {
 			std["database/sql"] = struct{}{}
+		}
+		if q.Arg.ContainSlice() {
+			std["strings"] = struct{}{}
 		}
 	}
 	for typeName, pkg := range stdlibTypes {

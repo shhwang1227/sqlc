@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/astutils"
-	"github.com/kyleconroy/sqlc/internal/sql/catalog"
-	"github.com/kyleconroy/sqlc/internal/sql/sqlerr"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/astutils"
+	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 func dataType(n *ast.TypeName) string {
@@ -66,9 +67,11 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 	}
 
 	var a []Parameter
+	fmt.Println("range args")
+	util.Xiazeminlog(args)
 	for _, ref := range args {
+		fmt.Println("args --------args  :", fmt.Sprintf("%#V", ref.parent))
 		switch n := ref.parent.(type) {
-
 		case *limitOffset:
 			a = append(a, Parameter{
 				Number: ref.ref.Number,
@@ -318,7 +321,90 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 
 		case *ast.ParamRef:
 			a = append(a, Parameter{Number: ref.ref.Number})
+		case *ast.In:
+			fmt.Println("*********begin in **************")
+			if n == nil || n.List == nil {
+				fmt.Println("ast.In is nil")
+				continue
+			}
 
+			number := 0
+			if pr, ok := n.List[0].(*ast.ParamRef); ok {
+				number = pr.Number
+			}
+
+			left, ok := n.Expr.(*ast.ColumnRef)
+			if !ok {
+				fmt.Println("not a param name xxxxxxxxxxxx")
+				continue
+			}
+			util.Xiazeminlog(left)
+			util.Xiazeminlog(n)
+
+			//a = append(a, Parameter{Number: number, Column: nil})
+
+			items := stringSlice(left.Fields)
+			var key, alias string
+			switch len(items) {
+			case 1:
+				key = items[0]
+			case 2:
+				alias = items[0]
+				key = items[1]
+			default:
+				panic("too many field items: " + strconv.Itoa(len(items)))
+			}
+
+			search := tables
+			if alias != "" {
+				if original, ok := aliasMap[alias]; ok {
+					search = []*ast.TableName{original}
+				} else {
+					for _, fqn := range tables {
+						if fqn.Name == alias {
+							search = []*ast.TableName{fqn}
+						}
+					}
+				}
+			}
+
+			var found int
+			for _, table := range search {
+				if c, ok := typeMap[table.Schema][table.Name][key]; ok {
+					found += 1
+					if ref.name != "" {
+						key = ref.name
+					}
+					a = append(a, Parameter{
+						Number: number,
+						Column: &Column{
+							IsSlice:  true,
+							Name:     parameterName(ref.ref.Number, key),
+							DataType: dataType(&c.Type),
+							NotNull:  c.IsNotNull,
+							IsArray:  c.IsArray,
+							Table:    table,
+						},
+					})
+				}
+			}
+
+			if found == 0 {
+				return nil, &sqlerr.Error{
+					Code:     "42703",
+					Message:  fmt.Sprintf("column \"%s\" does not exist", key),
+					Location: left.Location,
+				}
+			}
+			if found > 1 {
+				return nil, &sqlerr.Error{
+					Code:     "42703",
+					Message:  fmt.Sprintf("column reference \"%s\" is ambiguous", key),
+					Location: left.Location,
+				}
+			}
+
+			fmt.Println("********* end in **************")
 		default:
 			fmt.Printf("unsupported reference type: %T", n)
 		}

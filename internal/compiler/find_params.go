@@ -1,8 +1,10 @@
 package compiler
 
 import (
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/astutils"
+	"fmt"
+
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/astutils"
 )
 
 func findParameters(root ast.Node) []paramRef {
@@ -17,6 +19,10 @@ type paramRef struct {
 	rv     *ast.RangeVar
 	ref    *ast.ParamRef
 	name   string // Named parameter support
+}
+
+func (p *paramRef) GetName() string {
+	return p.name
 }
 
 type paramSearch struct {
@@ -104,7 +110,8 @@ func (p paramSearch) Visit(node ast.Node) astutils.Visitor {
 
 	case *ast.ParamRef:
 		parent := p.parent
-
+		//占位符号
+		//fmt.Println("ast.ParamRef",*n)
 		if count, ok := p.limitCount.(*ast.ParamRef); ok {
 			if n.Number == count.Number {
 				parent = &limitCount{}
@@ -142,6 +149,9 @@ func (p paramSearch) Visit(node ast.Node) astutils.Visitor {
 			p.seen[n.Location] = struct{}{}
 		}
 		return nil
+	case *ast.In:
+		p.parent = node
+		fmt.Println("range var inxiazemin  fild_params.go")
 	}
 	return p
 }

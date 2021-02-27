@@ -17,7 +17,10 @@ type Debug struct {
 }
 
 func DebugFromEnv() (Debug, error) {
-	d := Debug{}
+	d := Debug{
+		DumpAST:true,
+		DumpCatalog:true,
+	}
 	val := os.Getenv("SQLCDEBUG")
 	if val == "" {
 		return d, nil

@@ -3,9 +3,9 @@ package validate
 import (
 	"fmt"
 
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/astutils"
-	"github.com/kyleconroy/sqlc/internal/sql/sqlerr"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/astutils"
+	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
 )
 
 func ParamRef(n ast.Node) error {

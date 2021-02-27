@@ -3,14 +3,16 @@ package golang
 import (
 	"strings"
 
-	"github.com/kyleconroy/sqlc/internal/metadata"
+	"github.com/xiazemin/sqlc/internal/metadata"
 )
 
 type QueryValue struct {
-	Emit   bool
-	Name   string
-	Struct *Struct
-	Typ    string
+	Emit    bool
+	Name    string
+	Struct  *Struct
+	Typ     string
+	IsSlice bool
+	Slice   []*QueryValue
 }
 
 func (v QueryValue) EmitStruct() bool {
@@ -25,9 +27,30 @@ func (v QueryValue) isEmpty() bool {
 	return v.Typ == "" && v.Name == "" && v.Struct == nil
 }
 
+func (v QueryValue) IsSliceType() bool {
+	return v.IsSlice
+}
+
+func (v QueryValue) ContainSlice() bool {
+	if v.Struct != nil {
+		for _, f := range v.Struct.Fields {
+			if f.IsSlice {
+				return true
+			}
+		}
+	}
+	if v.IsSlice {
+		return true
+	}
+	return false
+}
+
 func (v QueryValue) Pair() string {
 	if v.isEmpty() {
 		return ""
+	}
+	if v.IsSlice {
+		return v.Name + " []" + v.Type()
 	}
 	return v.Name + " " + v.Type()
 }
@@ -57,11 +80,14 @@ func (v QueryValue) Params() string {
 		for _, f := range v.Struct.Fields {
 			if strings.HasPrefix(f.Type, "[]") && f.Type != "[]byte" {
 				out = append(out, "pq.Array("+v.Name+"."+f.Name+")")
+			} else if f.IsSlice {
+				out = append(out, v.Name+"."+f.Name)
 			} else {
 				out = append(out, v.Name+"."+f.Name)
 			}
 		}
 	}
+	//fmt.Println(out)
 	if len(out) <= 3 {
 		return strings.Join(out, ",")
 	}
@@ -86,6 +112,7 @@ func (v QueryValue) Scan() string {
 			}
 		}
 	}
+	//fmt.Println(out)
 	if len(out) <= 3 {
 		return strings.Join(out, ",")
 	}

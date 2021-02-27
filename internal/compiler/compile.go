@@ -9,14 +9,15 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kyleconroy/sqlc/internal/metadata"
-	"github.com/kyleconroy/sqlc/internal/migrations"
-	"github.com/kyleconroy/sqlc/internal/multierr"
-	"github.com/kyleconroy/sqlc/internal/opts"
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/catalog"
-	"github.com/kyleconroy/sqlc/internal/sql/sqlerr"
-	"github.com/kyleconroy/sqlc/internal/sql/sqlpath"
+	"github.com/xiazemin/sqlc/internal/metadata"
+	"github.com/xiazemin/sqlc/internal/migrations"
+	"github.com/xiazemin/sqlc/internal/multierr"
+	"github.com/xiazemin/sqlc/internal/opts"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
+	"github.com/xiazemin/sqlc/internal/sql/sqlpath"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 // TODO: Rename this interface Engine
@@ -100,13 +101,19 @@ func (c *Compiler) parseQueries(o opts.Parser) (*Result, error) {
 			continue
 		}
 		src := string(blob)
+		// 从原文件，得到一棵棵语法树 根节点
 		stmts, err := c.parser.Parse(strings.NewReader(src))
+		util.Xiazeminlog(stmts)
 		if err != nil {
 			merr.Add(filename, src, 0, err)
 			continue
 		}
 		for _, stmt := range stmts {
+			//fmt.Println(stmt.GetOpName())
+			//解析查询
 			query, err := c.parseQuery(stmt.Raw, src, o)
+			fmt.Println("query")
+			util.Xiazeminlog(query)
 			if err == ErrUnsupportedStatementType {
 				continue
 			}

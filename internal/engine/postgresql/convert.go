@@ -5,7 +5,7 @@ package postgresql
 import (
 	nodes "github.com/lfittl/pg_query_go/nodes"
 
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
 )
 
 func convertList(l nodes.List) *ast.List {

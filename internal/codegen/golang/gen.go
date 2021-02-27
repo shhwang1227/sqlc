@@ -8,9 +8,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/kyleconroy/sqlc/internal/codegen"
-	"github.com/kyleconroy/sqlc/internal/compiler"
-	"github.com/kyleconroy/sqlc/internal/config"
+	"github.com/xiazemin/sqlc/internal/codegen"
+	"github.com/xiazemin/sqlc/internal/compiler"
+	"github.com/xiazemin/sqlc/internal/config"
 )
 
 type Generateable interface {
@@ -235,6 +235,7 @@ import (
 {{end}}
 
 {{define "queryCode"}}
+{{ $ContainSlice := false }}
 {{range .GoQueries}}
 {{if $.OutputQuery .SourceName}}
 const {{.ConstantName}} = {{$.Q}}-- name: {{.MethodName}} {{.Cmd}}
@@ -243,7 +244,11 @@ const {{.ConstantName}} = {{$.Q}}-- name: {{.MethodName}} {{.Cmd}}
 
 {{if .Arg.EmitStruct}}
 type {{.Arg.Type}} struct { {{- range .Arg.Struct.Fields}}
+  {{if eq .IsSlice true}}
+  {{.Name}} []{{.Type}} {{if or ($.EmitJSONTags) ($.EmitDBTags)}}{{$.Q}}{{.Tag}}{{$.Q}}{{end}}
+  {{else}}
   {{.Name}} {{.Type}} {{if or ($.EmitJSONTags) ($.EmitDBTags)}}{{$.Q}}{{.Tag}}{{$.Q}}{{end}}
+  {{- end}} 
   {{- end}}
 }
 {{end}}
@@ -255,11 +260,57 @@ type {{.Ret.Type}} struct { {{- range .Ret.Struct.Fields}}
 }
 {{end}}
 
+
+{{if eq $ContainSlice false }}
+{{if eq .Arg.ContainSlice true }}
+{{ $ContainSlice = true }}
+// Replace the nth occurrence of old in s by new.
+func replaceNth(s, old, new string, n int) string {
+	i := 0
+	for m := 1; m <= n; m++ {
+		x := strings.Index(s[i:], old)
+		if x < 0 {
+			break
+		}
+		i += x
+		if m == n {
+			return s[:i] + new + s[i+len(old):]
+		}
+		i += len(old)
+	}
+	return s
+}
+{{end -}}
+{{end -}}
+
 {{if eq .Cmd ":one"}}
 {{range .Comments}}//{{.}}
 {{end -}}
 func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Type}}, error) {
-  	{{- if $.EmitPreparedQueries}}
+	{{if .Arg.EmitStruct}}
+	{{$ConstantName := .ConstantName}}
+	{{$argNmae := .Arg.Name}}
+	{{$ConstantName}}:={{$ConstantName}}
+	{{- range .Arg.Struct.Fields}}
+	{{if eq .IsSlice true}}
+	{
+	param:="?"
+	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
+	 param+=",?"   
+	}
+	{{$ConstantName}}=replaceNth({{$ConstantName}}, "(?)", "("+param+")", 1)
+    }
+	{{- end}}
+	{{- end}}
+	{{- end}}
+	{{ if eq .Arg.IsSliceType true}}
+	   param:="?"
+	   for i:=0;i<len({{.Arg.Name}})-1;i++{
+		param+=",?"   
+	   }
+	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	{{end -}}
+	{{- if $.EmitPreparedQueries}}
 	row := q.queryRow(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
 	{{- else}}
 	row := q.db.QueryRowContext(ctx, {{.ConstantName}}, {{.Arg.Params}})
@@ -274,7 +325,30 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 {{range .Comments}}//{{.}}
 {{end -}}
 func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ([]{{.Ret.Type}}, error) {
-  	{{- if $.EmitPreparedQueries}}
+	{{if .Arg.EmitStruct}}
+	{{$ConstantName := .ConstantName}}
+	{{$argNmae := .Arg.Name}}
+	{{$ConstantName}}:={{$ConstantName}}
+	{{- range .Arg.Struct.Fields}}
+	{{if eq .IsSlice true}}
+	{
+	param:="?"
+	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
+	 param+=",?"   
+	}
+	{{$ConstantName}}=replaceNth({{$ConstantName}}, "(?)", "("+param+")", 1)
+    }
+	{{- end}}
+	{{- end}}
+	{{- end}}
+	{{ if eq .Arg.IsSliceType true}}
+	   param:="?"
+	   for i:=0;i<len({{.Arg.Name}})-1;i++{
+		param+=",?"   
+	   }
+	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	{{end -}}
+	{{- if $.EmitPreparedQueries}}
 	rows, err := q.query(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
   	{{- else}}
 	rows, err := q.db.QueryContext(ctx, {{.ConstantName}}, {{.Arg.Params}})
@@ -309,7 +383,23 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ([]{{.Ret.
 {{range .Comments}}//{{.}}
 {{end -}}
 func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
-  	{{- if $.EmitPreparedQueries}}
+	{{if .Arg.EmitStruct}}
+	{{$ConstantName := .ConstantName}}
+	{{$argNmae := .Arg.Name}}
+	{{$ConstantName}}:={{$ConstantName}}
+	{{- range .Arg.Struct.Fields}}
+	{{if eq .IsSlice true}}
+	{
+	param:="?"
+	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
+	 param+=",?"   
+	}
+	{{$ConstantName}}=replaceNth({{$ConstantName}}, "(?)", "("+param+")", 1)
+    }
+	{{- end}}
+	{{- end}}
+	{{- end}}
+	{{- if $.EmitPreparedQueries}}
 	_, err := q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
   	{{- else}}
 	_, err := q.db.ExecContext(ctx, {{.ConstantName}}, {{.Arg.Params}})
@@ -322,7 +412,23 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
 {{range .Comments}}//{{.}}
 {{end -}}
 func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (int64, error) {
-  	{{- if $.EmitPreparedQueries}}
+	{{if .Arg.EmitStruct}}
+	{{$ConstantName := .ConstantName}}
+	{{$argNmae := .Arg.Name}}
+	{{$ConstantName}}:={{$ConstantName}}
+	{{- range .Arg.Struct.Fields}}
+	{{if eq .IsSlice true}}
+	{
+	param:="?"
+	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
+	 param+=",?"   
+	}
+	{{$ConstantName}}=replaceNth({{$ConstantName}}, "(?)", "("+param+")", 1)
+    }
+	{{- end}}
+	{{- end}}
+	{{- end}}
+	{{- if $.EmitPreparedQueries}}
 	result, err := q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
   	{{- else}}
 	result, err := q.db.ExecContext(ctx, {{.ConstantName}}, {{.Arg.Params}})
@@ -376,6 +482,7 @@ func Generate(r *compiler.Result, settings config.CombinedSettings) (map[string]
 	enums := buildEnums(r, settings)
 	structs := buildStructs(r, settings)
 	queries := buildQueries(r, settings, structs)
+	//fmt.Println("code gen queries",queries)
 	return generate(settings, enums, structs, queries)
 }
 
@@ -424,8 +531,7 @@ func generate(settings config.CombinedSettings, enums []Enum, structs []Struct, 
 		}
 		code, err := format.Source(b.Bytes())
 		if err != nil {
-			fmt.Println(b.String())
-			return fmt.Errorf("source error: %w", err)
+			return fmt.Errorf("source error: %w %s", err, b.String())
 		}
 		if !strings.HasSuffix(name, ".go") {
 			name += ".go"

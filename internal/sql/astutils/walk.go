@@ -3,7 +3,7 @@ package astutils
 import (
 	"fmt"
 
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
 )
 
 type Visitor interface {
@@ -17,7 +17,7 @@ func (vf VisitorFunc) Visit(node ast.Node) Visitor {
 	return vf
 }
 
-func Walk(f Visitor, node ast.Node) {
+func 	Walk(f Visitor, node ast.Node) {
 	if f = f.Visit(node); f == nil {
 		return
 	}
@@ -2115,6 +2115,12 @@ func Walk(f Visitor, node ast.Node) {
 		}
 		if n.TypeName != nil {
 			Walk(f, n.TypeName)
+		}
+	case *ast.In:
+		if n.List!=nil{
+			for _,l:=range n.List{
+				Walk(f,l)
+			}
 		}
 
 	default:

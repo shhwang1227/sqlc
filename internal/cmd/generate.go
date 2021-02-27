@@ -10,13 +10,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/kyleconroy/sqlc/internal/codegen/golang"
-	"github.com/kyleconroy/sqlc/internal/codegen/kotlin"
-	"github.com/kyleconroy/sqlc/internal/compiler"
-	"github.com/kyleconroy/sqlc/internal/config"
-	"github.com/kyleconroy/sqlc/internal/debug"
-	"github.com/kyleconroy/sqlc/internal/multierr"
-	"github.com/kyleconroy/sqlc/internal/opts"
+	"github.com/xiazemin/sqlc/internal/codegen/golang"
+	"github.com/xiazemin/sqlc/internal/codegen/kotlin"
+	"github.com/xiazemin/sqlc/internal/compiler"
+	"github.com/xiazemin/sqlc/internal/config"
+	"github.com/xiazemin/sqlc/internal/debug"
+	"github.com/xiazemin/sqlc/internal/multierr"
+	"github.com/xiazemin/sqlc/internal/opts"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 const errMessageNoVersion = `The configuration file must have a version number.
@@ -150,8 +151,10 @@ func Generate(e Env, dir, filename string, stderr io.Writer) (map[string]string,
 			}
 			name = combo.Kotlin.Package
 		}
-
+		
 		result, failed := parse(e, name, dir, sql.SQL, combo, parseOpts, stderr)
+		util.Xiazeminlog(result)
+		//fmt.Println("\n parse result------ \n ",result)
 		if failed {
 			errored = true
 			break

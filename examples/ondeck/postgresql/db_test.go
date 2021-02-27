@@ -6,7 +6,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kyleconroy/sqlc/internal/sqltest"
+	"github.com/xiazemin/sqlc/internal/sqltest"
 
 	"github.com/google/go-cmp/cmp"
 )

@@ -3,11 +3,11 @@ package rewrite
 import (
 	"fmt"
 
-	"github.com/kyleconroy/sqlc/internal/config"
-	"github.com/kyleconroy/sqlc/internal/source"
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/astutils"
-	"github.com/kyleconroy/sqlc/internal/sql/named"
+	"github.com/xiazemin/sqlc/internal/config"
+	"github.com/xiazemin/sqlc/internal/source"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/astutils"
+	"github.com/xiazemin/sqlc/internal/sql/named"
 )
 
 // Given an AST node, return the string representation of names
@@ -45,8 +45,10 @@ func NamedParameters(engine config.Engine, raw *ast.RawStmt) (*ast.RawStmt, map[
 	foundFunc := astutils.Search(raw, named.IsParamFunc)
 	foundSign := astutils.Search(raw, named.IsParamSign)
 	if len(foundFunc.Items)+len(foundSign.Items) == 0 {
+		//fmt.Println("raw, map[int]string{}")
 		return raw, map[int]string{}, nil
 	}
+	//fmt.Println("not raw, map[int]string{}",foundFunc,foundSign)
 
 	hasNamedParameterSupport := engine != config.EngineMySQL
 
@@ -57,7 +59,7 @@ func NamedParameters(engine config.Engine, raw *ast.RawStmt) (*ast.RawStmt, map[
 		node := cr.Node()
 		switch {
 
-		case named.IsParamFunc(node):
+		case named.IsParamFunc(node)://函数参数
 			fun := node.(*ast.FuncCall)
 			param, isConst := flatten(fun.Args)
 			if num, ok := args[param]; ok && hasNamedParameterSupport {
@@ -92,7 +94,7 @@ func NamedParameters(engine config.Engine, raw *ast.RawStmt) (*ast.RawStmt, map[
 			})
 			return false
 
-		case isNamedParamSignCast(node):
+		case isNamedParamSignCast(node)://类型转换
 			expr := node.(*ast.A_Expr)
 			cast := expr.Rexpr.(*ast.TypeCast)
 			param, _ := flatten(cast.Arg)
@@ -119,9 +121,10 @@ func NamedParameters(engine config.Engine, raw *ast.RawStmt) (*ast.RawStmt, map[
 			})
 			return false
 
-		case named.IsParamSign(node):
+		case named.IsParamSign(node): //赋值
 			expr := node.(*ast.A_Expr)
 			param, _ := flatten(expr.Rexpr)
+		//	fmt.Println("  flatten assign param ",param)
 			if num, ok := args[param]; ok {
 				cr.Replace(&ast.ParamRef{
 					Number:   num,
@@ -142,7 +145,9 @@ func NamedParameters(engine config.Engine, raw *ast.RawStmt) (*ast.RawStmt, map[
 				New:      fmt.Sprintf("$%d", args[param]),
 			})
 			return false
-
+		case named.IsIn(node):
+			//fmt.Println("xiazemin In ",node)
+		    return false
 		default:
 			return true
 		}

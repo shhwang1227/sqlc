@@ -1,8 +1,8 @@
 package compiler
 
 import (
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/catalog"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/catalog"
 )
 
 type QueryCatalog struct {
@@ -41,6 +41,7 @@ func buildQueryCatalog(c *catalog.Catalog, node ast.Node) (*QueryCatalog, error)
 			}
 		}
 	}
+	//fmt.Println("qc, nil",qc)
 	return qc, nil
 }
 

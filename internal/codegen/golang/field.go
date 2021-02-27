@@ -11,6 +11,7 @@ type Field struct {
 	Type    string
 	Tags    map[string]string
 	Comment string
+	IsSlice bool
 }
 
 func (gf Field) Tag() string {

@@ -5,12 +5,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/kyleconroy/sqlc/internal/codegen"
-	"github.com/kyleconroy/sqlc/internal/compiler"
-	"github.com/kyleconroy/sqlc/internal/config"
-	"github.com/kyleconroy/sqlc/internal/core"
-	"github.com/kyleconroy/sqlc/internal/inflection"
-	"github.com/kyleconroy/sqlc/internal/sql/catalog"
+	"github.com/xiazemin/sqlc/internal/codegen"
+	"github.com/xiazemin/sqlc/internal/compiler"
+	"github.com/xiazemin/sqlc/internal/config"
+	"github.com/xiazemin/sqlc/internal/core"
+	"github.com/xiazemin/sqlc/internal/inflection"
+	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 func buildEnums(r *compiler.Result, settings config.CombinedSettings) []Enum {
@@ -99,6 +100,7 @@ func buildStructs(r *compiler.Result, settings config.CombinedSettings) []Struct
 type goColumn struct {
 	id int
 	*compiler.Column
+	IsSlice bool
 }
 
 func columnName(c *compiler.Column, pos int) string {
@@ -109,7 +111,11 @@ func columnName(c *compiler.Column, pos int) string {
 }
 
 func paramName(p compiler.Parameter) string {
+	if p.Column == nil {
+		return fmt.Sprintf("dollar_Column_%d", p.Number)
+	}
 	if p.Column.Name != "" {
+		//	fmt.Println(p.Column.Name)
 		return argName(p.Column.Name)
 	}
 	return fmt.Sprintf("dollar_%d", p.Number)
@@ -138,7 +144,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 		if query.Cmd == "" {
 			continue
 		}
-
+		//  fmt.Println(query)
 		gq := Query{
 			Cmd:          query.Cmd,
 			ConstantName: codegen.LowerTitle(query.Name),
@@ -149,32 +155,38 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 			Comments:     query.Comments,
 		}
 
+		fmt.Println("r.Queries")
+		util.Xiazeminlog(query)
+
 		if len(query.Params) == 1 {
 			p := query.Params[0]
 			gq.Arg = QueryValue{
-				Name: paramName(p),
-				Typ:  goType(r, p.Column, settings),
+				Name:    paramName(p),
+				Typ:     goType(r, p.Column, settings),
+				IsSlice: isSlice(p.Column),
 			}
 		} else if len(query.Params) > 1 {
 			var cols []goColumn
 			for _, p := range query.Params {
 				cols = append(cols, goColumn{
-					id:     p.Number,
-					Column: p.Column,
+					id:      p.Number,
+					Column:  p.Column,
+					IsSlice: isSlice(p.Column),
 				})
 			}
 			gq.Arg = QueryValue{
 				Emit:   true,
 				Name:   "arg",
-				Struct: columnsToStruct(r, gq.MethodName+"Params", cols, settings),
+				Struct: columnsToStruct(r, gq.MethodName+"Params", cols, settings), //@TODO xiazemin 数组一会儿处理
 			}
 		}
 
 		if len(query.Columns) == 1 {
 			c := query.Columns[0]
 			gq.Ret = QueryValue{
-				Name: columnName(c, 0),
-				Typ:  goType(r, c, settings),
+				Name:    columnName(c, 0),
+				Typ:     goType(r, c, settings),
+				IsSlice: isSlice(c),
 			}
 		} else if len(query.Columns) > 1 {
 			var gs *Struct
@@ -204,8 +216,9 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 				var columns []goColumn
 				for i, c := range query.Columns {
 					columns = append(columns, goColumn{
-						id:     i,
-						Column: c,
+						id:      i,
+						Column:  c,
+						IsSlice: isSlice(c),
 					})
 				}
 				gs = columnsToStruct(r, gq.MethodName+"Row", columns, settings)
@@ -217,11 +230,19 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 				Struct: gs,
 			}
 		}
-
+		//fmt.Println("  result gq",gq,"=---->\n",query)
+		util.Xiazeminlog(gq)
 		qs = append(qs, gq)
 	}
 	sort.Slice(qs, func(i, j int) bool { return qs[i].MethodName < qs[j].MethodName })
 	return qs
+}
+
+func isSlice(col *compiler.Column) bool {
+	if col == nil {
+		return false
+	}
+	return col.IsSlice
 }
 
 // It's possible that this method will generate duplicate JSON tag values
@@ -262,9 +283,10 @@ func columnsToStruct(r *compiler.Result, name string, columns []goColumn, settin
 			tags["json:"] = tagName
 		}
 		gs.Fields = append(gs.Fields, Field{
-			Name: fieldName,
-			Type: goType(r, c.Column, settings),
-			Tags: tags,
+			Name:    fieldName,
+			Type:    goType(r, c.Column, settings),
+			Tags:    tags,
+			IsSlice: c.IsSlice,
 		})
 		seen[colName]++
 	}

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/astutils"
-	"github.com/kyleconroy/sqlc/internal/sql/lang"
-	"github.com/kyleconroy/sqlc/internal/sql/sqlerr"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/astutils"
+	"github.com/xiazemin/sqlc/internal/sql/lang"
+	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
 )
 
 func hasStarRef(cf *ast.ColumnRef) bool {

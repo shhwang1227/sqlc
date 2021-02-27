@@ -1,7 +1,7 @@
 # sqlc: A SQL Compiler
 
-![go](https://github.com/kyleconroy/sqlc/workflows/go/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kyleconroy/sqlc)](https://goreportcard.com/report/github.com/kyleconroy/sqlc)
+![go](https://github.com/xiazemin/sqlc/workflows/go/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/xiazemin/sqlc)](https://goreportcard.com/report/github.com/xiazemin/sqlc)
 
 sqlc generates **type-safe code** from SQL. Here's how it works:
 
@@ -21,14 +21,14 @@ Check out [an interactive example](https://play.sqlc.dev/) to see it in action.
 ## Sponsors
 
 sqlc development is funded by our [generous
-sponsors](https://github.com/sponsors/kyleconroy), including the following
+sponsors](https://github.com/sponsors/xiazemin), including the following
 companies:
 
 - [Meter](https://meter.com)
 - [ngrok](https://ngrok.com)
 
 If you use sqlc at your company, please consider [becoming a
-sponsor](https://github.com/sponsors/kyleconroy) today.
+sponsor](https://github.com/sponsors/xiazemin) today.
 
 Sponsors receive priority support via the sqlc Slack organization.
 

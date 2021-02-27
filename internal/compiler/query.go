@@ -1,7 +1,7 @@
 package compiler
 
 import (
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
 )
 
 type Table struct {
@@ -14,6 +14,7 @@ type Column struct {
 	DataType string
 	NotNull  bool
 	IsArray  bool
+	IsSlice  bool
 	Comment  string
 	Length   *int
 
@@ -35,6 +36,7 @@ type Query struct {
 	Filename string
 }
 
+//这里存的是参数，in 之所以有问题是因为没有解析出Parameter，name 是Colum的name
 type Parameter struct {
 	Number int
 	Column *Column

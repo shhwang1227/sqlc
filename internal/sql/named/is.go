@@ -1,8 +1,8 @@
 package named
 
 import (
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/astutils"
+	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/sql/astutils"
 )
 
 func IsParamFunc(node ast.Node) bool {
@@ -19,4 +19,11 @@ func IsParamFunc(node ast.Node) bool {
 func IsParamSign(node ast.Node) bool {
 	expr, ok := node.(*ast.A_Expr)
 	return ok && astutils.Join(expr.Name, ".") == "@"
+}
+
+func IsIn(node ast.Node)bool{
+	if _,ok:=node.(*ast.In);ok{
+		return true
+	}
+	return false
 }

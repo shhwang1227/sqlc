@@ -1,5 +1,5 @@
 package ast
-
+//	范围限制变量
 type RangeVar struct {
 	Catalogname    *string
 	Schemaname     *string
@@ -8,6 +8,7 @@ type RangeVar struct {
 	Relpersistence byte
 	Alias          *Alias
 	Location       int
+	TypeIn bool
 }
 
 func (n *RangeVar) Pos() int {
