@@ -14,7 +14,6 @@ import (
 	"github.com/xiazemin/sqlc/internal/metadata"
 	"github.com/xiazemin/sqlc/internal/sql/ast"
 	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
-	"fmt"
 )
 
 func NewParser() *Parser {
@@ -52,7 +51,7 @@ func normalizeErr(err error) error {
 
 func (p *Parser) Parse(r io.Reader) ([]ast.Statement, error) {
 	blob, err := ioutil.ReadAll(r)
-	if	 err != nil {
+	if err != nil {
 		return nil, err
 	}
 	//语法树根节点
@@ -65,8 +64,8 @@ func (p *Parser) Parse(r io.Reader) ([]ast.Statement, error) {
 		converter := &cc{}
 		out := converter.convert(stmtNodes[i])
 		//fmt.Println("convert result ",stmts,"\n======>\n",out)
-		if todo, ok := out.(*ast.TODO); ok {
-			fmt.Println("to  do ---",todo)
+		if _, ok := out.(*ast.TODO); ok {
+			// fmt.Println("to  do ---",todo)
 			continue
 		}
 
@@ -74,9 +73,9 @@ func (p *Parser) Parse(r io.Reader) ([]ast.Statement, error) {
 		text := stmtNodes[i].Text()
 		loc := strings.Index(string(blob), text)
 
-		opName:=text
-		if i,ok:=out.(*ast.In);ok{
-			opName=i.TypeName
+		opName := text
+		if i, ok := out.(*ast.In); ok {
+			opName = i.TypeName
 			//fmt.Println("after convert ast in",*i)
 		}
 		stmts = append(stmts, ast.Statement{
@@ -84,7 +83,7 @@ func (p *Parser) Parse(r io.Reader) ([]ast.Statement, error) {
 				Stmt:         out,
 				StmtLocation: loc,
 				StmtLen:      len(text) - 1, // Subtract one to remove semicolon
-				TypeName:opName,
+				TypeName:     opName,
 			},
 		})
 	}

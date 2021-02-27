@@ -155,7 +155,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 			Comments:     query.Comments,
 		}
 
-		fmt.Println("r.Queries")
+		//fmt.Println("r.Queries")
 		util.Xiazeminlog(query)
 
 		if len(query.Params) == 1 {

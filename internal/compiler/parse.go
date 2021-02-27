@@ -87,11 +87,11 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 
 	//获取参数名
 	rvs := rangeVars(raw.Stmt)
-	fmt.Println("params:")
+	// fmt.Println("params:")
 	util.Xiazeminlog(rvs)
 	//获取参数的 占位符号 位置 ？
 	refs := findParameters(raw.Stmt)
-	fmt.Println("params refs:")
+	// fmt.Println("params refs:")
 	util.Xiazeminlog(refs)
 	//fmt.Println("raw, namedParams, edits",len(rvs),len(refs),raw, namedParams, edits)
 	/*for _,rfs:=range refs{
@@ -109,14 +109,14 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	}
 	//解析参数,这里是真正解析参数的地方 @xiazemin
 	params, err := resolveCatalogRefs(c.catalog, rvs, refs, namedParams)
-	fmt.Println("resolveCatalogRefs")
+	// fmt.Println("resolveCatalogRefs")
 	util.Xiazeminlog(params)
 	if err != nil {
 		return nil, err
 	}
 
 	qc, err := buildQueryCatalog(c.catalog, raw.Stmt)
-	fmt.Println("buildQueryCatalog")
+	// fmt.Println("buildQueryCatalog")
 	util.Xiazeminlog(params)
 	if err != nil {
 		return nil, err
@@ -170,7 +170,7 @@ func rangeVars(root ast.Node) []*ast.RangeVar {
 			//	fmt.Println("range var",*n)
 			vars = append(vars, n)
 		case *ast.In:
-			fmt.Println("range var inxiazemin")
+			// fmt.Println("range var inxiazemin")
 			name := "inxiazemin"
 			vars = append(vars, &ast.RangeVar{
 				Catalogname: &name,

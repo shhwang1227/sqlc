@@ -1,11 +1,12 @@
 package util
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 )
 
-func Xiazeminlog(v interface{}){
-	d,_:=json.Marshal(v)
+func Xiazeminlog(v interface{}) {
+	return
+	d, _ := json.Marshal(v)
 	fmt.Println(string(d))
 }

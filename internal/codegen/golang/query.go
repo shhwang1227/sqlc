@@ -71,7 +71,7 @@ func (v QueryValue) GenerateFunctions() string {
 					result += fmt.Sprintf(template, f.Type, f.Type)
 					functions[functionName] = result
 				}
-				fmt.Println("************", result)
+				//fmt.Println("************", result)
 			}
 		}
 		if v.IsSlice {

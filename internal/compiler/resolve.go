@@ -67,10 +67,10 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 	}
 
 	var a []Parameter
-	fmt.Println("range args")
+	// fmt.Println("range args")
 	util.Xiazeminlog(args)
 	for _, ref := range args {
-		fmt.Println("args --------args  :", fmt.Sprintf("%#V", ref.parent))
+		// fmt.Println("args --------args  :", fmt.Sprintf("%#V", ref.parent))
 		switch n := ref.parent.(type) {
 		case *limitOffset:
 			a = append(a, Parameter{
@@ -322,7 +322,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 		case *ast.ParamRef:
 			a = append(a, Parameter{Number: ref.ref.Number})
 		case *ast.In:
-			fmt.Println("*********begin in **************")
+			// fmt.Println("*********begin in **************")
 			if n == nil || n.List == nil {
 				fmt.Println("ast.In is nil")
 				continue
@@ -335,7 +335,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 
 			left, ok := n.Expr.(*ast.ColumnRef)
 			if !ok {
-				fmt.Println("not a param name xxxxxxxxxxxx")
+				// fmt.Println("not a param name xxxxxxxxxxxx")
 				continue
 			}
 			util.Xiazeminlog(left)
@@ -404,7 +404,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 				}
 			}
 
-			fmt.Println("********* end in **************")
+			// fmt.Println("********* end in **************")
 		default:
 			fmt.Printf("unsupported reference type: %T", n)
 		}

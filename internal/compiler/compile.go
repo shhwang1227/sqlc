@@ -112,7 +112,7 @@ func (c *Compiler) parseQueries(o opts.Parser) (*Result, error) {
 			//fmt.Println(stmt.GetOpName())
 			//解析查询
 			query, err := c.parseQuery(stmt.Raw, src, o)
-			fmt.Println("query")
+			// fmt.Println("query")
 			util.Xiazeminlog(query)
 			if err == ErrUnsupportedStatementType {
 				continue

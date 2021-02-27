@@ -1,8 +1,6 @@
 package compiler
 
 import (
-	"fmt"
-
 	"github.com/xiazemin/sqlc/internal/sql/ast"
 	"github.com/xiazemin/sqlc/internal/sql/astutils"
 )
@@ -151,7 +149,7 @@ func (p paramSearch) Visit(node ast.Node) astutils.Visitor {
 		return nil
 	case *ast.In:
 		p.parent = node
-		fmt.Println("range var inxiazemin  fild_params.go")
+		// fmt.Println("range var inxiazemin  fild_params.go")
 	}
 	return p
 }
