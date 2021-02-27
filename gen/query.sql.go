@@ -11,20 +11,22 @@ import (
 
 const createAuthor = `-- name: CreateAuthor :execresult
 INSERT INTO authors (
-  name, bio
+  id,name,bio
 ) VALUES (
-  ?, ? 
+  ?,?, ? 
 )
 `
 
 type CreateAuthorParams struct {
+	ID int32
+
 	Name string
 
 	Bio sql.NullString
 }
 
 func (q *Queries) CreateAuthor(ctx context.Context, arg CreateAuthorParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createAuthor, arg.Name, arg.Bio)
+	return q.db.ExecContext(ctx, createAuthor, arg.ID, arg.Name, arg.Bio)
 }
 
 const deleteAuthor = `-- name: DeleteAuthor :exec
@@ -42,6 +44,15 @@ const deleteAuthorIn = `-- name: DeleteAuthorIn :exec
 DELETE FROM authors
 WHERE id in (?)
 `
+
+func int32Slice2interface(l []int32) []interface{} {
+	v := make([]interface{}, len(l))
+	for i, val := range l {
+		v[i] = val
+
+	}
+	return v
+}
 
 // Replace the nth occurrence of old in s by new.
 func replaceNth(s, old, new string, n int) string {
@@ -78,6 +89,15 @@ type GetOneAuthorParams struct {
 	Name []string
 }
 
+func stringSlice2interface(l []string) []interface{} {
+	v := make([]interface{}, len(l))
+	for i, val := range l {
+		v[i] = val
+
+	}
+	return v
+}
+
 func (q *Queries) GetOneAuthor(ctx context.Context, arg GetOneAuthorParams) (Author, error) {
 
 	getOneAuthor := getOneAuthor
@@ -98,7 +118,7 @@ func (q *Queries) GetOneAuthor(ctx context.Context, arg GetOneAuthorParams) (Aut
 		getOneAuthor = replaceNth(getOneAuthor, "(?)", "("+param+")", 1)
 	}
 
-	row := q.db.QueryRowContext(ctx, getOneAuthor, arg.Bio, arg.ID, arg.Name)
+	row := q.db.QueryRowContext(ctx, getOneAuthor, append(append([]interface{}{arg.Bio}, int32Slice2interface(arg.ID)...), stringSlice2interface(arg.Name)...)...)
 	var i Author
 	err := row.Scan(&i.ID, &i.Name, &i.Bio)
 	return i, err
@@ -165,7 +185,7 @@ func (q *Queries) ListAuthors(ctx context.Context, arg ListAuthorsParams) ([]Aut
 		listAuthors = replaceNth(listAuthors, "(?)", "("+param+")", 1)
 	}
 
-	rows, err := q.db.QueryContext(ctx, listAuthors, arg.Bio, arg.ID, arg.Name)
+	rows, err := q.db.QueryContext(ctx, listAuthors, append(append([]interface{}{arg.Bio}, int32Slice2interface(arg.ID)...), stringSlice2interface(arg.Name)...)...)
 	if err != nil {
 		return nil, err
 	}

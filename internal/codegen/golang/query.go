@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/xiazemin/sqlc/internal/metadata"
@@ -45,6 +46,47 @@ func (v QueryValue) ContainSlice() bool {
 	return false
 }
 
+var functions map[string]string = make(map[string]string)
+
+func (v QueryValue) GenerateFunctions() string {
+	result := ""
+	if v.ContainSlice() {
+		template := `func %sSlice2interface(l []%s) []interface{} {
+		   v := make([]interface{}, len(l))
+		   for i, val := range l {
+			   v[i] = val
+	   
+		   }
+		   return v
+	   }
+
+	   `
+		if v.Struct != nil {
+			for _, f := range v.Struct.Fields {
+				if f.IsSlice {
+					functionName := f.Type + "Slice2interface"
+					if _, ok := functions[functionName]; ok {
+						continue
+					}
+					result += fmt.Sprintf(template, f.Type, f.Type)
+					functions[functionName] = result
+				}
+				fmt.Println("************", result)
+			}
+		}
+		if v.IsSlice {
+			functionName := v.Typ + "Slice2interface"
+			if _, ok := functions[functionName]; ok {
+				return result
+			}
+			result += fmt.Sprintf(template, v.Typ, v.Typ)
+			functions[functionName] = result
+		}
+
+	}
+	return result
+}
+
 func (v QueryValue) Pair() string {
 	if v.isEmpty() {
 		return ""
@@ -77,13 +119,37 @@ func (v QueryValue) Params() string {
 			out = append(out, v.Name)
 		}
 	} else {
-		for _, f := range v.Struct.Fields {
-			if strings.HasPrefix(f.Type, "[]") && f.Type != "[]byte" {
-				out = append(out, "pq.Array("+v.Name+"."+f.Name+")")
-			} else if f.IsSlice {
-				out = append(out, v.Name+"."+f.Name)
-			} else {
-				out = append(out, v.Name+"."+f.Name)
+		if v.ContainSlice() {
+			//append(append([]interface{}{arg.Bio}, int32Slice2interface(arg.ID)...), stringSlice2interface(arg.Name)...)...
+			out := ""
+
+			for _, f := range v.Struct.Fields {
+				if strings.HasPrefix(f.Type, "[]") && f.Type != "[]byte" {
+					out = fmt.Sprintf(out, "pq.Array("+v.Name+"."+f.Name+")")
+				} else if f.IsSlice {
+					sl := f.Type + "Slice2interface(" + v.Name + "." + f.Name + ")"
+					if out == "" {
+						out = sl
+					} else {
+						out = "append(" + out + "," + sl + "...)"
+					}
+
+				} else {
+					if out == "" {
+						out = "[]interface{}{" + v.Name + "." + f.Name + "}"
+					} else {
+						out = "append(" + out + "," + v.Name + "." + f.Name + ")"
+					}
+				}
+			}
+			return out + "..."
+		} else {
+			for _, f := range v.Struct.Fields {
+				if strings.HasPrefix(f.Type, "[]") && f.Type != "[]byte" {
+					out = append(out, "pq.Array("+v.Name+"."+f.Name+")")
+				} else {
+					out = append(out, v.Name+"."+f.Name)
+				}
 			}
 		}
 	}

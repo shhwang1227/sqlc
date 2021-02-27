@@ -260,6 +260,7 @@ type {{.Ret.Type}} struct { {{- range .Ret.Struct.Fields}}
 }
 {{end}}
 
+{{.Arg.GenerateFunctions}}
 
 {{if eq $ContainSlice false }}
 {{if eq .Arg.ContainSlice true }}
