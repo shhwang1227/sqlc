@@ -1,8 +1,6 @@
 package compiler
 
 import (
-	"fmt"
-
 	"github.com/xiazemin/sqlc/internal/sql/ast"
 	"github.com/xiazemin/sqlc/internal/sql/astutils"
 	"github.com/xiazemin/sqlc/internal/util"
@@ -112,7 +110,6 @@ func (p paramSearch) Visit(node ast.Node) astutils.Visitor {
 	case *ast.ParamRef:
 		parent := p.parent
 		//占位符号
-		//fmt.Println("ast.ParamRef",*n)
 		if count, ok := p.limitCount.(*ast.ParamRef); ok {
 			if n.Number == count.Number {
 				parent = &limitCount{}
@@ -155,8 +152,7 @@ func (p paramSearch) Visit(node ast.Node) astutils.Visitor {
 			p.parent = node
 		} else {
 			if sel, ok := n.Sel.(*ast.SelectStmt); ok && sel.FromClause != nil {
-				fmt.Println("sel, ok :=")
-				util.Xiazeminlog(sel)
+				util.Xiazeminlog("sel, ok", sel)
 
 				from := sel.FromClause
 				if schema, ok := from.Items[0].(*ast.RangeVar); ok && schema != nil {
@@ -169,7 +165,6 @@ func (p paramSearch) Visit(node ast.Node) astutils.Visitor {
 				}
 			}
 		}
-		// fmt.Println("range var inxiazemin  fild_params.go")
 	}
 	return p
 }

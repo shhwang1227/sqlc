@@ -2124,8 +2124,7 @@ func Walk(f Visitor, node ast.Node) {
 			}
 		}
 		if n.Sel != nil {
-			fmt.Println("n.Sel is not nil")
-			util.Xiazeminlog(n.Sel)
+			util.Xiazeminlog("n.Sel is not nil", n.Sel)
 			Walk(f, n.Sel)
 		}
 

@@ -115,7 +115,6 @@ func paramName(p compiler.Parameter) string {
 		return fmt.Sprintf("dollar_Column_%d", p.Number)
 	}
 	if p.Column.Name != "" {
-		//	fmt.Println(p.Column.Name)
 		return argName(p.Column.Name)
 	}
 	return fmt.Sprintf("dollar_%d", p.Number)
@@ -144,7 +143,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 		if query.Cmd == "" {
 			continue
 		}
-		//  fmt.Println(query)
+
 		gq := Query{
 			Cmd:          query.Cmd,
 			ConstantName: codegen.LowerTitle(query.Name),
@@ -155,8 +154,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 			Comments:     query.Comments,
 		}
 
-		//fmt.Println("r.Queries")
-		util.Xiazeminlog(query)
+		util.Xiazeminlog("query", query)
 
 		if len(query.Params) == 1 {
 			p := query.Params[0]
@@ -230,8 +228,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 				Struct: gs,
 			}
 		}
-		//fmt.Println("  result gq",gq,"=---->\n",query)
-		util.Xiazeminlog(gq)
+		util.Xiazeminlog(" result gq", gq)
 		qs = append(qs, gq)
 	}
 	sort.Slice(qs, func(i, j int) bool { return qs[i].MethodName < qs[j].MethodName })

@@ -513,7 +513,6 @@ func Generate(r *compiler.Result, settings config.CombinedSettings) (map[string]
 	enums := buildEnums(r, settings)
 	structs := buildStructs(r, settings)
 	queries := buildQueries(r, settings, structs)
-	//fmt.Println("code gen queries",queries)
 	return generate(settings, enums, structs, queries)
 }
 

@@ -5,9 +5,9 @@ import (
 	"fmt"
 )
 
-func Xiazeminlog(v interface{}) {
-	//return
+func Xiazeminlog(index string, v interface{}) {
+	return
 	//debug.PrintStack()
 	d, _ := json.Marshal(v)
-	fmt.Println(string(d))
+	fmt.Println(index, ":", string(d))
 }

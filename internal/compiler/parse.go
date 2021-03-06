@@ -49,7 +49,7 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	case *ast.SelectStmt:
 	case *ast.DeleteStmt:
 	case *ast.InsertStmt:
-		util.Xiazeminlog(n)
+		util.Xiazeminlog("ast.InsertStmt", n)
 		if err := validate.InsertStmt(n); err != nil {
 			return nil, err
 		}
@@ -69,12 +69,10 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	if err := validate.FuncCall(c.catalog, raw); err != nil {
 		return nil, err
 	}
-	//fmt.Println("internal compiler parse.go",rawSQL)
 
 	//每一个sql 语句的解析
 	name, cmd, err := metadata.Parse(strings.TrimSpace(rawSQL), c.parser.CommentSyntax())
 	//解析出每个语句的函数名和后面的返回
-	//fmt.Println("name, cmd",name, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -87,17 +85,11 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 
 	//获取参数名
 	rvs := rangeVars(raw.Stmt)
-	// fmt.Println("params:")
-	util.Xiazeminlog(rvs)
+	util.Xiazeminlog("params", rvs)
 	//获取参数的 占位符号 位置 ？
 	refs := findParameters(raw.Stmt)
-	fmt.Println("params refs:")
-	util.Xiazeminlog(refs)
-	//fmt.Println("raw, namedParams, edits",len(rvs),len(refs),raw, namedParams, edits)
-	/*for _,rfs:=range refs{
-		fmt.Println(rfs.GetName())
-	}
-	*/
+	util.Xiazeminlog("params refs", refs)
+
 	if o.UsePositionalParameters {
 		edits, err = rewriteNumberedParameters(refs, raw, rawSQL)
 		if err != nil {
@@ -109,20 +101,19 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	}
 	//解析参数,这里是真正解析参数的地方 @xiazemin
 	params, err := resolveCatalogRefs(c.catalog, rvs, refs, namedParams)
-	// fmt.Println("resolveCatalogRefs")
-	util.Xiazeminlog(params)
+
+	util.Xiazeminlog("resolveCatalogRefs", params)
 	if err != nil {
 		return nil, err
 	}
 
 	qc, err := buildQueryCatalog(c.catalog, raw.Stmt)
-	// fmt.Println("buildQueryCatalog")
-	util.Xiazeminlog(params)
+	util.Xiazeminlog("buildQueryCatalog", params)
 	if err != nil {
 		return nil, err
 	}
 	cols, err := outputColumns(qc, raw.Stmt)
-	//fmt.Println("qc, err,",qc, cols, err )
+
 	if err != nil {
 		return nil, err
 	}
@@ -140,18 +131,16 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 
 	// If the query string was edited, make sure the syntax is valid
 	if expanded != rawSQL {
-		//fmt.Println("expanded != rawSQL",expanded, rawSQL)
 		if _, err := c.parser.Parse(strings.NewReader(expanded)); err != nil {
 			return nil, fmt.Errorf("edited query syntax is invalid: %w", err)
 		}
 	}
 
 	trimmed, comments, err := source.StripComments(expanded)
-	//fmt.Println("trimmed, comments, err",trimmed, comments, err)
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("Query cmd,name,params,cols ",cmd,name,params,cols)
+
 	return &Query{
 		Cmd:      cmd,
 		Comments: comments,
@@ -167,11 +156,9 @@ func rangeVars(root ast.Node) []*ast.RangeVar {
 	find := astutils.VisitorFunc(func(node ast.Node) {
 		switch n := node.(type) {
 		case *ast.RangeVar:
-			//	fmt.Println("range var",*n)
 			vars = append(vars, n)
 		case *ast.In:
-			fmt.Println("range var inxiazemin")
-			util.Xiazeminlog(n)
+			util.Xiazeminlog("range var in", n)
 			if n.Sel == nil {
 				/*	name := "inxiazemin"
 					vars = append(vars, &ast.RangeVar{

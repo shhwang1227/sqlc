@@ -63,9 +63,7 @@ func (p *Parser) Parse(r io.Reader) ([]ast.Statement, error) {
 	for i := range stmtNodes {
 		converter := &cc{}
 		out := converter.convert(stmtNodes[i])
-		//fmt.Println("convert result ",stmts,"\n======>\n",out)
 		if _, ok := out.(*ast.TODO); ok {
-			// fmt.Println("to  do ---",todo)
 			continue
 		}
 

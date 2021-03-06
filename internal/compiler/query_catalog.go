@@ -41,7 +41,6 @@ func buildQueryCatalog(c *catalog.Catalog, node ast.Node) (*QueryCatalog, error)
 			}
 		}
 	}
-	//fmt.Println("qc, nil",qc)
 	return qc, nil
 }
 

@@ -67,11 +67,9 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 	}
 
 	var a []Parameter
-	fmt.Println("range args")
-	util.Xiazeminlog(args)
+	util.Xiazeminlog("range args", args)
 	for _, ref := range args {
-		fmt.Println("args --------args  :", fmt.Sprintf("%#V", ref.parent))
-		util.Xiazeminlog(ref)
+		util.Xiazeminlog("args ---", ref)
 		switch n := ref.parent.(type) {
 		case *limitOffset:
 			a = append(a, Parameter{
@@ -323,7 +321,6 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 		case *ast.ParamRef:
 			a = append(a, Parameter{Number: ref.ref.Number})
 		case *ast.In:
-			// fmt.Println("*********begin in **************")
 			if n == nil || n.List == nil {
 				fmt.Println("ast.In is nil")
 				continue
@@ -336,14 +333,10 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 
 			left, ok := n.Expr.(*ast.ColumnRef)
 			if !ok {
-				// fmt.Println("not a param name xxxxxxxxxxxx")
 				continue
 			}
-			util.Xiazeminlog(left)
-			util.Xiazeminlog(n)
-
-			//a = append(a, Parameter{Number: number, Column: nil})
-
+			util.Xiazeminlog("left", left)
+			util.Xiazeminlog("n", n)
 			items := stringSlice(left.Fields)
 			var key, alias string
 			switch len(items) {
@@ -357,8 +350,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 			}
 
 			var found int
-			fmt.Println("---------range sel---------")
-			util.Xiazeminlog(n)
+			util.Xiazeminlog("range sel-", n)
 			if n.Sel == nil {
 				search := tables
 				if alias != "" {
@@ -372,10 +364,9 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 						}
 					}
 				}
-				fmt.Println("---------range table-----xxxx----", found)
-				util.Xiazeminlog(search)
+
+				util.Xiazeminlog("range table", search)
 				for _, table := range search {
-					util.Xiazeminlog(n)
 					if c, ok := typeMap[table.Schema][table.Name][key]; ok && n.TableName == table.Name {
 						found += 1
 						if ref.name != "" {
@@ -406,16 +397,13 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 				}
 			}
 			if found > 1 {
-				fmt.Println("---------------------typeMap-------------------------")
-				util.Xiazeminlog(typeMap)
+				util.Xiazeminlog("typeMap", typeMap)
 				return nil, &sqlerr.Error{
 					Code:     "42703",
 					Message:  fmt.Sprintf("in same name column reference \"%s\" is ambiguous", key),
 					Location: left.Location,
 				}
 			}
-
-			// fmt.Println("********* end in **************")
 		default:
 			fmt.Printf("unsupported reference type: %T", n)
 		}

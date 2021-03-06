@@ -151,10 +151,9 @@ func Generate(e Env, dir, filename string, stderr io.Writer) (map[string]string,
 			}
 			name = combo.Kotlin.Package
 		}
-		
+
 		result, failed := parse(e, name, dir, sql.SQL, combo, parseOpts, stderr)
-		util.Xiazeminlog(result)
-		//fmt.Println("\n parse result------ \n ",result)
+		util.Xiazeminlog("parse result------", result)
 		if failed {
 			errored = true
 			break

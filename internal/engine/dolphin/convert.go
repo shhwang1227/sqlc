@@ -420,7 +420,7 @@ func (c *cc) convertLists(lists [][]pcast.ExprNode) *ast.List {
 func (c *cc) convertParamMarkerExpr(n *driver.ParamMarkerExpr) *ast.ParamRef {
 	// Parameter numbers start at one
 	c.paramCount += 1
-	util.Xiazeminlog(n)
+	util.Xiazeminlog("convertParamMarkerExpr", n)
 	return &ast.ParamRef{
 		Number:   c.paramCount,
 		Location: n.Offset,
@@ -499,8 +499,7 @@ func (c *cc) convertUpdateStmt(n *pcast.UpdateStmt) *ast.UpdateStmt {
 		*/
 		if rel.Sel != nil {
 			//rangeVar = rel
-			fmt.Println("xiazemin ast in range var")
-			util.Xiazeminlog(rel)
+			util.Xiazeminlog("ast in range var", rel)
 		}
 
 	default:
@@ -831,7 +830,7 @@ func (c *cc) convertJoin(n *pcast.Join) *ast.List {
 		if ta, ok := n.Left.(*pcast.TableSource); ok {
 			c.convertCurrentTableName(ta)
 		}
-		util.Xiazeminlog(n.Left)
+		util.Xiazeminlog("n.Left", n.Left)
 		tables = append(tables, c.convert(n.Left))
 	}
 	return &ast.List{Items: tables}
@@ -841,8 +840,7 @@ func (c *cc) convertCurrentTableName(n *pcast.TableSource) {
 
 	if tn, ok := n.Source.(*pcast.TableName); ok {
 		c.currentTableName = tn.Name.O
-		fmt.Println("currentTableName", c.currentTableName)
-		util.Xiazeminlog(tn)
+		util.Xiazeminlog("currentTableName", tn)
 	}
 }
 
@@ -924,20 +922,14 @@ func (c *cc) convertPatternInExpr(n *pcast.PatternInExpr) ast.Node {
 	if selec, ok := sel.(*ast.SelectStmt); ok {
 		switch selecI := selec.FromClause.Items[0].(type) {
 		case *ast.RangeSubselect:
-			fmt.Println("*ast.RangeSubselect")
-			util.Xiazeminlog(selecI)
-			util.Xiazeminlog(selec)
+			util.Xiazeminlog("*ast.RangeSubselect", selecI)
 		case *ast.RangeVar:
-			fmt.Println("*ast.RangeVar")
-			util.Xiazeminlog(selecI)
+			util.Xiazeminlog("*ast.RangeVar", selecI)
 			table = *selecI.Relname
-			//fmt.Println("-xxxxxxxxxxxxxxx", table)
 		default:
-			fmt.Println("default")
-			util.Xiazeminlog(selecI)
+			util.Xiazeminlog("default", selecI)
 		}
 	}
-	fmt.Println("-xxxxxxxxxxxxxxx", table, current)
 	return &ast.In{
 		Expr:           c.convert(n.Expr),
 		List:           l,

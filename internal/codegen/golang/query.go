@@ -71,7 +71,6 @@ func (v QueryValue) GenerateFunctions() string {
 					result += fmt.Sprintf(template, f.Type, f.Type)
 					functions[functionName] = result
 				}
-				//fmt.Println("************", result)
 			}
 		}
 		if v.IsSlice {
@@ -157,7 +156,6 @@ func (v QueryValue) Params() string {
 			}
 		}
 	}
-	//fmt.Println(out)
 	if len(out) <= 3 {
 		return strings.Join(out, ",")
 	}
@@ -182,7 +180,6 @@ func (v QueryValue) Scan() string {
 			}
 		}
 	}
-	//fmt.Println(out)
 	if len(out) <= 3 {
 		return strings.Join(out, ",")
 	}
