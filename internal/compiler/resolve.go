@@ -67,10 +67,11 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 	}
 
 	var a []Parameter
-	// fmt.Println("range args")
+	fmt.Println("range args")
 	util.Xiazeminlog(args)
 	for _, ref := range args {
-		// fmt.Println("args --------args  :", fmt.Sprintf("%#V", ref.parent))
+		fmt.Println("args --------args  :", fmt.Sprintf("%#V", ref.parent))
+		util.Xiazeminlog(ref)
 		switch n := ref.parent.(type) {
 		case *limitOffset:
 			a = append(a, Parameter{
@@ -145,7 +146,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 
 				var found int
 				for _, table := range search {
-					if c, ok := typeMap[table.Schema][table.Name][key]; ok {
+					if c, ok := typeMap[table.Schema][table.Name][key]; ok && (left.TableName == "" || left.TableName == table.Name) {
 						found += 1
 						if ref.name != "" {
 							key = ref.name
@@ -173,7 +174,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 				if found > 1 {
 					return nil, &sqlerr.Error{
 						Code:     "42703",
-						Message:  fmt.Sprintf("column reference \"%s\" is ambiguous", key),
+						Message:  fmt.Sprintf("RESOLVE MESSAGE column reference \"%s\" is ambiguous", key),
 						Location: left.Location,
 					}
 				}
@@ -355,38 +356,46 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 				panic("too many field items: " + strconv.Itoa(len(items)))
 			}
 
-			search := tables
-			if alias != "" {
-				if original, ok := aliasMap[alias]; ok {
-					search = []*ast.TableName{original}
-				} else {
-					for _, fqn := range tables {
-						if fqn.Name == alias {
-							search = []*ast.TableName{fqn}
+			var found int
+			fmt.Println("---------range sel---------")
+			util.Xiazeminlog(n)
+			if n.Sel == nil {
+				search := tables
+				if alias != "" {
+					if original, ok := aliasMap[alias]; ok {
+						search = []*ast.TableName{original}
+					} else {
+						for _, fqn := range tables {
+							if fqn.Name == alias {
+								search = []*ast.TableName{fqn}
+							}
 						}
 					}
 				}
-			}
-
-			var found int
-			for _, table := range search {
-				if c, ok := typeMap[table.Schema][table.Name][key]; ok {
-					found += 1
-					if ref.name != "" {
-						key = ref.name
+				fmt.Println("---------range table-----xxxx----", found)
+				util.Xiazeminlog(search)
+				for _, table := range search {
+					util.Xiazeminlog(n)
+					if c, ok := typeMap[table.Schema][table.Name][key]; ok && n.TableName == table.Name {
+						found += 1
+						if ref.name != "" {
+							key = ref.name
+						}
+						a = append(a, Parameter{
+							Number: number,
+							Column: &Column{
+								IsSlice:  true,
+								Name:     parameterName(ref.ref.Number, key),
+								DataType: dataType(&c.Type),
+								NotNull:  c.IsNotNull,
+								IsArray:  c.IsArray,
+								Table:    table,
+							},
+						})
 					}
-					a = append(a, Parameter{
-						Number: number,
-						Column: &Column{
-							IsSlice:  true,
-							Name:     parameterName(ref.ref.Number, key),
-							DataType: dataType(&c.Type),
-							NotNull:  c.IsNotNull,
-							IsArray:  c.IsArray,
-							Table:    table,
-						},
-					})
 				}
+			} else {
+				fmt.Println("------------------------")
 			}
 
 			if found == 0 {
@@ -397,9 +406,11 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 				}
 			}
 			if found > 1 {
+				fmt.Println("---------------------typeMap-------------------------")
+				util.Xiazeminlog(typeMap)
 				return nil, &sqlerr.Error{
 					Code:     "42703",
-					Message:  fmt.Sprintf("column reference \"%s\" is ambiguous", key),
+					Message:  fmt.Sprintf("in same name column reference \"%s\" is ambiguous", key),
 					Location: left.Location,
 				}
 			}

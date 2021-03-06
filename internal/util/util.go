@@ -6,7 +6,8 @@ import (
 )
 
 func Xiazeminlog(v interface{}) {
-	return
+	//return
+	//debug.PrintStack()
 	d, _ := json.Marshal(v)
 	fmt.Println(string(d))
 }

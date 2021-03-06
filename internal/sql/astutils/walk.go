@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 type Visitor interface {
@@ -17,7 +18,7 @@ func (vf VisitorFunc) Visit(node ast.Node) Visitor {
 	return vf
 }
 
-func 	Walk(f Visitor, node ast.Node) {
+func Walk(f Visitor, node ast.Node) {
 	if f = f.Visit(node); f == nil {
 		return
 	}
@@ -2117,10 +2118,15 @@ func 	Walk(f Visitor, node ast.Node) {
 			Walk(f, n.TypeName)
 		}
 	case *ast.In:
-		if n.List!=nil{
-			for _,l:=range n.List{
-				Walk(f,l)
+		if n.List != nil {
+			for _, l := range n.List {
+				Walk(f, l)
 			}
+		}
+		if n.Sel != nil {
+			fmt.Println("n.Sel is not nil")
+			util.Xiazeminlog(n.Sel)
+			Walk(f, n.Sel)
 		}
 
 	default:

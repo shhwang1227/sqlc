@@ -16,7 +16,8 @@ import (
 )
 
 type cc struct {
-	paramCount int
+	paramCount       int
+	currentTableName string
 }
 
 func todo(n pcast.Node) *ast.TODO {
@@ -98,7 +99,7 @@ func (c *cc) convertAlterTableStmt(n *pcast.AlterTableStmt) ast.Node {
 			newName := spec.NewColumnName.String()
 			return &ast.RenameColumnStmt{
 				Table:   parseTableName(n.Table),
-				Col:     &ast.ColumnRef{Name: oldName},
+				Col:     &ast.ColumnRef{Name: oldName, TableName: c.currentTableName},
 				NewName: &newName,
 			}
 
@@ -271,6 +272,7 @@ func (c *cc) convertColumnNameExpr(n *pcast.ColumnNameExpr) *ast.ColumnRef {
 		Fields: &ast.List{
 			Items: items,
 		},
+		TableName: c.currentTableName,
 	}
 }
 
@@ -495,6 +497,11 @@ func (c *cc) convertUpdateStmt(n *pcast.UpdateStmt) *ast.UpdateStmt {
 		}
 		rangeVar=left
 		*/
+		if rel.Sel != nil {
+			//rangeVar = rel
+			fmt.Println("xiazemin ast in range var")
+			util.Xiazeminlog(rel)
+		}
 
 	default:
 		panic("expected range var")
@@ -533,6 +540,7 @@ func (c *cc) convertWildCardField(n *pcast.WildCardField) *ast.ColumnRef {
 		Fields: &ast.List{
 			Items: items,
 		},
+		TableName: c.currentTableName,
 	}
 }
 
@@ -804,6 +812,9 @@ func (c *cc) convertJoin(n *pcast.Join) *ast.List {
 		return &ast.List{}
 	}
 	if n.Right != nil && n.Left != nil {
+		if ta, ok := n.Left.(*pcast.TableSource); ok {
+			c.convertCurrentTableName(ta)
+		}
 		return &ast.List{
 			Items: []ast.Node{&ast.JoinExpr{
 				Larg:  c.convert(n.Left),
@@ -817,9 +828,22 @@ func (c *cc) convertJoin(n *pcast.Join) *ast.List {
 		tables = append(tables, c.convert(n.Right))
 	}
 	if n.Left != nil {
+		if ta, ok := n.Left.(*pcast.TableSource); ok {
+			c.convertCurrentTableName(ta)
+		}
+		util.Xiazeminlog(n.Left)
 		tables = append(tables, c.convert(n.Left))
 	}
 	return &ast.List{Items: tables}
+}
+
+func (c *cc) convertCurrentTableName(n *pcast.TableSource) {
+
+	if tn, ok := n.Source.(*pcast.TableName); ok {
+		c.currentTableName = tn.Name.O
+		fmt.Println("currentTableName", c.currentTableName)
+		util.Xiazeminlog(tn)
+	}
 }
 
 func (c *cc) convertKillStmt(n *pcast.KillStmt) ast.Node {
@@ -883,7 +907,8 @@ func (c *cc) convertPartitionByClause(n *pcast.PartitionByClause) ast.Node {
 func (c *cc) convertPatternInExpr(n *pcast.PatternInExpr) ast.Node {
 	if n == nil {
 		return &ast.In{
-			TypeName: "XiazeminInExprNull",
+			TypeName:  "XiazeminInExprNull",
+			TableName: c.currentTableName,
 		}
 	}
 
@@ -893,12 +918,34 @@ func (c *cc) convertPatternInExpr(n *pcast.PatternInExpr) ast.Node {
 		l = append(l, lele)
 	}
 
+	current := c.currentTableName
+	sel := c.convert(n.Sel)
+	table := ""
+	if selec, ok := sel.(*ast.SelectStmt); ok {
+		switch selecI := selec.FromClause.Items[0].(type) {
+		case *ast.RangeSubselect:
+			fmt.Println("*ast.RangeSubselect")
+			util.Xiazeminlog(selecI)
+			util.Xiazeminlog(selec)
+		case *ast.RangeVar:
+			fmt.Println("*ast.RangeVar")
+			util.Xiazeminlog(selecI)
+			table = *selecI.Relname
+			//fmt.Println("-xxxxxxxxxxxxxxx", table)
+		default:
+			fmt.Println("default")
+			util.Xiazeminlog(selecI)
+		}
+	}
+	fmt.Println("-xxxxxxxxxxxxxxx", table, current)
 	return &ast.In{
-		Expr:     c.convert(n.Expr),
-		List:     l,
-		Not:      n.Not,
-		Sel:      c.convert(n.Sel),
-		TypeName: "XiazeminInExpr",
+		Expr:           c.convert(n.Expr),
+		List:           l,
+		Not:            n.Not,
+		Sel:            sel,
+		TypeName:       "XiazeminInExpr",
+		TableName:      current,
+		ChildTableName: table,
 	}
 }
 

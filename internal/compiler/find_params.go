@@ -1,8 +1,11 @@
 package compiler
 
 import (
+	"fmt"
+
 	"github.com/xiazemin/sqlc/internal/sql/ast"
 	"github.com/xiazemin/sqlc/internal/sql/astutils"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 func findParameters(root ast.Node) []paramRef {
@@ -148,7 +151,24 @@ func (p paramSearch) Visit(node ast.Node) astutils.Visitor {
 		}
 		return nil
 	case *ast.In:
-		p.parent = node
+		if n.Sel == nil {
+			p.parent = node
+		} else {
+			if sel, ok := n.Sel.(*ast.SelectStmt); ok && sel.FromClause != nil {
+				fmt.Println("sel, ok :=")
+				util.Xiazeminlog(sel)
+
+				from := sel.FromClause
+				if schema, ok := from.Items[0].(*ast.RangeVar); ok && schema != nil {
+					p.rangeVar = &ast.RangeVar{
+						Catalogname: schema.Catalogname,
+						Schemaname:  schema.Schemaname,
+						Relname:     schema.Relname,
+						TypeIn:      true,
+					}
+				}
+			}
+		}
 		// fmt.Println("range var inxiazemin  fild_params.go")
 	}
 	return p

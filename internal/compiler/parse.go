@@ -91,7 +91,7 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	util.Xiazeminlog(rvs)
 	//获取参数的 占位符号 位置 ？
 	refs := findParameters(raw.Stmt)
-	// fmt.Println("params refs:")
+	fmt.Println("params refs:")
 	util.Xiazeminlog(refs)
 	//fmt.Println("raw, namedParams, edits",len(rvs),len(refs),raw, namedParams, edits)
 	/*for _,rfs:=range refs{
@@ -170,18 +170,24 @@ func rangeVars(root ast.Node) []*ast.RangeVar {
 			//	fmt.Println("range var",*n)
 			vars = append(vars, n)
 		case *ast.In:
-			// fmt.Println("range var inxiazemin")
-			name := "inxiazemin"
-			vars = append(vars, &ast.RangeVar{
-				Catalogname: &name,
-				Schemaname:  &name,
-				Relname:     &name,
-				Inh:         false,
-				//Relpersistence byte
-				//Alias          *Alias
-				Location: n.Pos(),
-				TypeIn:   true,
-			})
+			fmt.Println("range var inxiazemin")
+			util.Xiazeminlog(n)
+			if n.Sel == nil {
+				/*	name := "inxiazemin"
+					vars = append(vars, &ast.RangeVar{
+						Catalogname: &name,
+						Schemaname:  &name,
+						Relname:     &name,
+						Inh:         false,
+						//Relpersistence byte
+						//Alias          *Alias
+						Location: n.Pos(),
+						TypeIn:   true,
+					})
+				*/
+			} else {
+
+			}
 		}
 	})
 	astutils.Walk(find, root)

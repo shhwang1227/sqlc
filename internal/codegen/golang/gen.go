@@ -400,6 +400,13 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
 	{{- end}}
 	{{- end}}
 	{{- end}}
+	{{ if eq .Arg.IsSliceType true}}
+	   param:="?"
+	   for i:=0;i<len({{.Arg.Name}})-1;i++{
+		param+=",?"   
+	   }
+	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	_, err := q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
   	{{- else}}
@@ -445,7 +452,30 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (int64, er
 {{range .Comments}}//{{.}}
 {{end -}}
 func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (sql.Result, error) {
-  	{{- if $.EmitPreparedQueries}}
+	{{if .Arg.EmitStruct}}
+	{{$ConstantName := .ConstantName}}
+	{{$argNmae := .Arg.Name}}
+	{{$ConstantName}}:={{$ConstantName}}
+	{{- range .Arg.Struct.Fields}}
+	{{if eq .IsSlice true}}
+	{
+	param:="?"
+	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
+	 param+=",?"   
+	}
+	{{$ConstantName}}=replaceNth({{$ConstantName}}, "(?)", "("+param+")", 1)
+    }
+	{{- end}}
+	{{- end}}
+	{{- end}}
+	{{ if eq .Arg.IsSliceType true}}
+	   param:="?"
+	   for i:=0;i<len({{.Arg.Name}})-1;i++{
+		param+=",?"   
+	   }
+	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	{{end -}}
+	{{- if $.EmitPreparedQueries}}
 	return q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
   	{{- else}}
 	return q.db.ExecContext(ctx, {{.ConstantName}}, {{.Arg.Params}})

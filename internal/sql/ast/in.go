@@ -8,8 +8,10 @@ type In struct {
 	// Not is true, the expression is "not in".
 	Not bool
 	// Sel is the subquery, may be rewritten to other type of expression.
-	Sel      Node
-	TypeName string
+	Sel            Node
+	TypeName       string
+	TableName      string
+	ChildTableName string
 }
 
 func (n *In) Pos() int {

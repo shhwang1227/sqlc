@@ -116,7 +116,11 @@ func (v QueryValue) Params() string {
 		if strings.HasPrefix(v.Typ, "[]") && v.Typ != "[]byte" {
 			out = append(out, "pq.Array("+v.Name+")")
 		} else {
-			out = append(out, v.Name)
+			if v.IsSlice {
+				out = append(out, v.Typ+"Slice2interface("+v.Name+")...")
+			} else {
+				out = append(out, v.Name)
+			}
 		}
 	} else {
 		if v.ContainSlice() {

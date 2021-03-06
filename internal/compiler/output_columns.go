@@ -329,7 +329,7 @@ func outputColumnRefs(res *ast.ResTarget, tables []*Table, node *ast.ColumnRef) 
 	if found > 1 {
 		return nil, &sqlerr.Error{
 			Code:     "42703",
-			Message:  fmt.Sprintf("column reference \"%s\" is ambiguous", name),
+			Message:  fmt.Sprintf("OUT column reference \"%s\" is ambiguous", name),
 			Location: res.Location,
 		}
 	}
