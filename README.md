@@ -9,6 +9,12 @@ sqlc generates **type-safe code** from SQL. Here's how it works:
 Check out [an interactive example](https://github.com/xiazemin/sqlc_study) to see it in action.
 
 
+#安装
+ go get -u github.com/xiazemin/sqlc
+ go get -u github.com/xiazemin/sqlc/cmd/sqlc
+#使用
+实例：https://github.com/xiazemin/sqlc_study
+
 ## Sponsors
 
 sqlc development is funded by our [generous
