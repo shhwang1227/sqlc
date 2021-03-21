@@ -339,9 +339,9 @@ func (i *importer) queryImports(filename string) fileImports {
 		if q.Cmd == metadata.CmdExecResult {
 			std["database/sql"] = struct{}{}
 		}
-		if q.Arg.ContainSlice() {
+		/*if q.Arg.ContainSlice() {
 			std["strings"] = struct{}{}
-		}
+		}*/
 	}
 	for typeName, pkg := range stdlibTypes {
 		if uses(typeName) {
