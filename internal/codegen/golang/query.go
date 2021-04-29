@@ -64,21 +64,21 @@ func (v QueryValue) GenerateFunctions() string {
 		if v.Struct != nil {
 			for _, f := range v.Struct.Fields {
 				if f.IsSlice {
-					functionName := f.Type + "Slice2interface"
+					functionName := formatType(f.Type) + "Slice2interface"
 					if _, ok := functions[functionName]; ok {
 						continue
 					}
-					result += fmt.Sprintf(template, f.Type, f.Type)
+					result += fmt.Sprintf(template, formatType(f.Type), f.Type)
 					functions[functionName] = result
 				}
 			}
 		}
 		if v.IsSlice {
-			functionName := v.Typ + "Slice2interface"
+			functionName := formatType(v.Typ) + "Slice2interface"
 			if _, ok := functions[functionName]; ok {
 				return result
 			}
-			result += fmt.Sprintf(template, v.Typ, v.Typ)
+			result += fmt.Sprintf(template, formatType(v.Typ), v.Typ)
 			functions[functionName] = result
 		}
 
@@ -106,6 +106,13 @@ func (v QueryValue) Type() string {
 	panic("no type for QueryValue: " + v.Name)
 }
 
+func formatType(typ string) string {
+	if len(typ) > 4 && typ[:4] == "sql." {
+		return typ[4:]
+	}
+	return typ
+}
+
 func (v QueryValue) Params() string {
 	if v.isEmpty() {
 		return ""
@@ -116,7 +123,7 @@ func (v QueryValue) Params() string {
 			out = append(out, "pq.Array("+v.Name+")")
 		} else {
 			if v.IsSlice {
-				out = append(out, v.Typ+"Slice2interface("+v.Name+")...")
+				out = append(out, formatType(v.Typ)+"Slice2interface("+v.Name+")...")
 			} else {
 				out = append(out, v.Name)
 			}
@@ -130,7 +137,7 @@ func (v QueryValue) Params() string {
 				if strings.HasPrefix(f.Type, "[]") && f.Type != "[]byte" {
 					out = fmt.Sprintf(out, "pq.Array("+v.Name+"."+f.Name+")")
 				} else if f.IsSlice {
-					sl := f.Type + "Slice2interface(" + v.Name + "." + f.Name + ")"
+					sl := formatType(f.Type) + "Slice2interface(" + v.Name + "." + f.Name + ")"
 					if out == "" {
 						out = sl
 					} else {
