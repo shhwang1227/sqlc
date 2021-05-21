@@ -36,9 +36,9 @@ func (c *cc) convertAlterTableStmt(n *pcast.AlterTableStmt) ast.Node {
 		switch spec.Tp {
 		case pcast.AlterTableAddColumns:
 			for _, def := range spec.NewColumns {
-				name := def.Name.String()
+				name := def.Name.OrigColName() // def.Name.String()
 				columnDef := ast.ColumnDef{
-					Colname:   def.Name.String(),
+					Colname:   def.Name.OrigColName(), // def.Name.String(),
 					TypeName:  &ast.TypeName{Name: types.TypeStr(def.Tp.Tp)},
 					IsNotNull: isNotNull(def),
 				}
@@ -66,9 +66,9 @@ func (c *cc) convertAlterTableStmt(n *pcast.AlterTableStmt) ast.Node {
 
 		case pcast.AlterTableModifyColumn:
 			for _, def := range spec.NewColumns {
-				name := def.Name.String()
+				name := def.Name.OrigColName() //def.Name.String()
 				columnDef := ast.ColumnDef{
-					Colname:   def.Name.String(),
+					Colname:   def.Name.OrigColName(), //def.Name.String(),
 					TypeName:  &ast.TypeName{Name: types.TypeStr(def.Tp.Tp)},
 					IsNotNull: isNotNull(def),
 				}
@@ -237,8 +237,9 @@ func (c *cc) convertCreateTableStmt(n *pcast.CreateTableStmt) ast.Node {
 				}
 			}
 		}
+
 		columnDef := ast.ColumnDef{
-			Colname:   def.Name.String(),
+			Colname:   def.Name.OrigColName(), // def.Name.String(),
 			TypeName:  &ast.TypeName{Name: types.TypeStr(def.Tp.Tp)},
 			IsNotNull: isNotNull(def),
 			Comment:   comment,

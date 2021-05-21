@@ -165,7 +165,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 				if found == 0 {
 					return nil, &sqlerr.Error{
 						Code:     "42703",
-						Message:  fmt.Sprintf("column \"%s\" does not exist", key),
+						Message:  fmt.Sprintf("168:column \"%s\" does not exist", key),
 						Location: left.Location,
 					}
 				}
@@ -302,7 +302,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 			} else {
 				return nil, &sqlerr.Error{
 					Code:     "42703",
-					Message:  fmt.Sprintf("column \"%s\" does not exist", key),
+					Message:  fmt.Sprintf("306: column \"%s\" does not exist", key),
 					Location: n.Location,
 				}
 			}
@@ -392,7 +392,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 			if found == 0 {
 				return nil, &sqlerr.Error{
 					Code:     "42703",
-					Message:  fmt.Sprintf("column \"%s\" does not exist", key),
+					Message:  fmt.Sprintf("396: column \"%s\" does not exist", key),
 					Location: left.Location,
 				}
 			}
