@@ -26,3 +26,8 @@ sponsor](https://github.com/sponsors/xiazemin) today.
 
 Sponsors receive priority support via the sqlc Slack organization.
 
+支持生成mock代码
+
+ //go:generate  mockgen -source=./querier.go  -destination=./mock/querier.go
+
+ go generate ./... 
