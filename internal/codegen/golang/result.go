@@ -154,7 +154,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 			Comments:     query.Comments,
 		}
 
-		util.Xiazeminlog("query", query)
+		util.Xiazeminlog("query", query, false)
 
 		if len(query.Params) == 1 {
 			p := query.Params[0]
@@ -228,7 +228,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 				Struct: gs,
 			}
 		}
-		util.Xiazeminlog(" result gq", gq)
+		util.Xiazeminlog(" result gq", gq, false)
 		qs = append(qs, gq)
 	}
 	sort.Slice(qs, func(i, j int) bool { return qs[i].MethodName < qs[j].MethodName })

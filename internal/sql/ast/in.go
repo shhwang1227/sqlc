@@ -12,8 +12,9 @@ type In struct {
 	TypeName       string
 	TableName      string
 	ChildTableName string
+	Location       int
 }
 
 func (n *In) Pos() int {
-	return 0
+	return n.Location
 }

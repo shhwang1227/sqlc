@@ -153,7 +153,11 @@ func Generate(e Env, dir, filename string, stderr io.Writer) (map[string]string,
 		}
 
 		result, failed := parse(e, name, dir, sql.SQL, combo, parseOpts, stderr)
-		util.Xiazeminlog("parse result------", result)
+		for _, q := range result.Queries {
+			if q.Name == "InsertMulti" {
+				util.Xiazeminlog("parse result------", q, false)
+			}
+		}
 		if failed {
 			errored = true
 			break

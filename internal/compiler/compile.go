@@ -103,7 +103,7 @@ func (c *Compiler) parseQueries(o opts.Parser) (*Result, error) {
 		src := string(blob)
 		// 从原文件，得到一棵棵语法树 根节点
 		stmts, err := c.parser.Parse(strings.NewReader(src))
-		util.Xiazeminlog("query stmts", stmts)
+		util.Xiazeminlog("query stmts", stmts, false)
 		if err != nil {
 			merr.Add(filename, src, 0, err)
 			continue
@@ -111,7 +111,7 @@ func (c *Compiler) parseQueries(o opts.Parser) (*Result, error) {
 		for _, stmt := range stmts {
 			//解析查询
 			query, err := c.parseQuery(stmt.Raw, src, o)
-			util.Xiazeminlog(stmt.GetOpName(), query)
+			util.Xiazeminlog(stmt.GetOpName(), query, false)
 			if err == ErrUnsupportedStatementType {
 				continue
 			}
