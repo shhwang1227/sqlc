@@ -61,7 +61,7 @@ func Generate(driverName string, dsn, path string) error {
 			path += "/"
 		}
 		fname := path + tableName + ".sql"
-		file, er := os.Open(fname)
+		file, er := os.OpenFile(fname, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0766)
 		defer file.Close()
 		if er != nil && os.IsNotExist(er) {
 			if file, err = os.Create(fname); err != nil {
