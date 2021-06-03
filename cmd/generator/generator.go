@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -67,6 +68,10 @@ func Generate(driverName string, dsn, path string) error {
 			if file, err = os.Create(fname); err != nil {
 				return err
 			}
+		}
+		reg := regexp.MustCompile("AUTO_INCREMENT=[0-9]* ")
+		if reg.Match([]byte(createSyntax)) {
+			createSyntax = string(reg.ReplaceAll([]byte(createSyntax), []byte(" ")))
 		}
 		file.WriteString(createSyntax + ";")
 		fmt.Println("generated:", fname)
