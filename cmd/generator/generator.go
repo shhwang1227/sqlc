@@ -68,7 +68,7 @@ func Generate(driverName string, dsn, path string) error {
 				return err
 			}
 		}
-		file.WriteString(createSyntax)
+		file.WriteString(createSyntax + ";")
 		fmt.Println("generated:", fname)
 	}
 
