@@ -49,7 +49,7 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	case *ast.SelectStmt:
 	case *ast.DeleteStmt:
 	case *ast.InsertStmt:
-		util.Xiazeminlog("ast.InsertStmt", n)
+		util.Xiazeminlog("ast.InsertStmt", n, false)
 		if err := validate.InsertStmt(n); err != nil {
 			return nil, err
 		}
@@ -80,15 +80,15 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 		return nil, err
 	}
 
-	//潜逃函数
+	//嵌套函数
 	raw, namedParams, edits := rewrite.NamedParameters(c.conf.Engine, raw)
 
 	//获取参数名
 	rvs := rangeVars(raw.Stmt)
-	util.Xiazeminlog("params", rvs)
+	util.Xiazeminlog("params", rvs, false)
 	//获取参数的 占位符号 位置 ？
 	refs := findParameters(raw.Stmt)
-	util.Xiazeminlog("params refs", refs)
+	util.Xiazeminlog("params refs", refs, false)
 
 	if o.UsePositionalParameters {
 		edits, err = rewriteNumberedParameters(refs, raw, rawSQL)
@@ -102,13 +102,19 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	//解析参数,这里是真正解析参数的地方 @xiazemin
 	params, err := resolveCatalogRefs(c.catalog, rvs, refs, namedParams)
 
-	util.Xiazeminlog("resolveCatalogRefs", params)
+	util.Xiazeminlog("resolveCatalogRefs", params, false)
+	if err != nil {
+		return nil, err
+	}
+	valuesParams, length, err := resolveCatalogValuesRefs(c.catalog, rvs, refs, namedParams)
+
+	util.Xiazeminlog("resolveCatalogRefs", valuesParams, false)
 	if err != nil {
 		return nil, err
 	}
 
 	qc, err := buildQueryCatalog(c.catalog, raw.Stmt)
-	util.Xiazeminlog("buildQueryCatalog", params)
+	util.Xiazeminlog("buildQueryCatalog", params, false)
 	if err != nil {
 		return nil, err
 	}
@@ -142,12 +148,14 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 	}
 
 	return &Query{
-		Cmd:      cmd,
-		Comments: comments,
-		Name:     name,
-		Params:   params,
-		Columns:  cols,
-		SQL:      trimmed,
+		Cmd:                   cmd,
+		Comments:              comments,
+		Name:                  name,
+		Params:                params,
+		Columns:               cols,
+		SQL:                   trimmed,
+		InsertValuesLen:       length,
+		InsertValuesParameter: valuesParams,
 	}, nil
 }
 
@@ -158,7 +166,7 @@ func rangeVars(root ast.Node) []*ast.RangeVar {
 		case *ast.RangeVar:
 			vars = append(vars, n)
 		case *ast.In:
-			util.Xiazeminlog("range var in", n)
+			util.Xiazeminlog("range var in", n, false)
 			if n.Sel == nil {
 				/*	name := "inxiazemin"
 					vars = append(vars, &ast.RangeVar{

@@ -28,6 +28,7 @@ type v1PackageSettings struct {
 	EmitExactTableNames bool       `json:"emit_exact_table_names,omitempty" yaml:"emit_exact_table_names"`
 	EmitEmptySlices     bool       `json:"emit_empty_slices,omitempty" yaml:"emit_empty_slices"`
 	Overrides           []Override `json:"overrides" yaml:"overrides"`
+	DSN                 string     `json:"dsn" yaml:"dsn"`
 }
 
 func v1ParseConfig(rd io.Reader) (Config, error) {
@@ -114,6 +115,7 @@ func (c *V1GenerateSettings) Translate() Config {
 					Overrides:           pkg.Overrides,
 				},
 			},
+			DSN: pkg.DSN,
 		})
 	}
 

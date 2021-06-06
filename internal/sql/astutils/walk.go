@@ -1268,6 +1268,7 @@ func Walk(f Visitor, node ast.Node) {
 			Walk(f, n.Relation)
 		}
 		if n.Cols != nil {
+			util.Xiazeminlog("InsertStmt.Cols", n.Cols, false)
 			Walk(f, n.Cols)
 		}
 		if n.SelectStmt != nil {
@@ -2124,7 +2125,7 @@ func Walk(f Visitor, node ast.Node) {
 			}
 		}
 		if n.Sel != nil {
-			util.Xiazeminlog("n.Sel is not nil", n.Sel)
+			util.Xiazeminlog("n.Sel is not nil", n.Sel, false)
 			Walk(f, n.Sel)
 		}
 

@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/xiazemin/sqlc/cmd/generator"
 	"github.com/xiazemin/sqlc/internal/codegen/golang"
 	"github.com/xiazemin/sqlc/internal/codegen/kotlin"
 	"github.com/xiazemin/sqlc/internal/compiler"
@@ -129,6 +130,9 @@ func Generate(e Env, dir, filename string, stderr io.Writer) (map[string]string,
 		// TODO: This feels like a hack that will bite us later
 		joined := make([]string, 0, len(sql.Schema))
 		for _, s := range sql.Schema {
+			if err := generator.Generate(string(sql.Engine), sql.DSN, filepath.Join(dir, s)); err != nil {
+				fmt.Println(err)
+			}
 			joined = append(joined, filepath.Join(dir, s))
 		}
 		sql.Schema = joined
@@ -153,7 +157,11 @@ func Generate(e Env, dir, filename string, stderr io.Writer) (map[string]string,
 		}
 
 		result, failed := parse(e, name, dir, sql.SQL, combo, parseOpts, stderr)
-		util.Xiazeminlog("parse result------", result)
+		for _, q := range result.Queries {
+			if q.Name == "InsertMulti" {
+				util.Xiazeminlog("parse result------", q, false)
+			}
+		}
 		if failed {
 			errored = true
 			break

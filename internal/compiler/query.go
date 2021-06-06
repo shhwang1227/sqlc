@@ -25,12 +25,14 @@ type Column struct {
 }
 
 type Query struct {
-	SQL      string
-	Name     string
-	Cmd      string // TODO: Pick a better name. One of: one, many, exec, execrows
-	Columns  []*Column
-	Params   []Parameter
-	Comments []string
+	SQL                   string
+	Name                  string
+	Cmd                   string // TODO: Pick a better name. One of: one, many, exec, execrows
+	Columns               []*Column
+	Params                []Parameter
+	Comments              []string
+	InsertValuesLen       int64
+	InsertValuesParameter []Parameter
 
 	// XXX: Hack
 	Filename string

@@ -101,6 +101,7 @@ type SQL struct {
 	Schema  Paths  `json:"schema" yaml:"schema"`
 	Queries Paths  `json:"queries" yaml:"queries"`
 	Gen     SQLGen `json:"gen" yaml:"gen"`
+	DSN     string `json:"dsn" yaml:"dsn"`
 }
 
 type SQLGen struct {

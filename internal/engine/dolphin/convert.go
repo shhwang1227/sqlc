@@ -36,9 +36,9 @@ func (c *cc) convertAlterTableStmt(n *pcast.AlterTableStmt) ast.Node {
 		switch spec.Tp {
 		case pcast.AlterTableAddColumns:
 			for _, def := range spec.NewColumns {
-				name := def.Name.String()
+				name := def.Name.OrigColName() // def.Name.String()
 				columnDef := ast.ColumnDef{
-					Colname:   def.Name.String(),
+					Colname:   def.Name.OrigColName(), // def.Name.String(),
 					TypeName:  &ast.TypeName{Name: types.TypeStr(def.Tp.Tp)},
 					IsNotNull: isNotNull(def),
 				}
@@ -66,9 +66,9 @@ func (c *cc) convertAlterTableStmt(n *pcast.AlterTableStmt) ast.Node {
 
 		case pcast.AlterTableModifyColumn:
 			for _, def := range spec.NewColumns {
-				name := def.Name.String()
+				name := def.Name.OrigColName() //def.Name.String()
 				columnDef := ast.ColumnDef{
-					Colname:   def.Name.String(),
+					Colname:   def.Name.OrigColName(), //def.Name.String(),
 					TypeName:  &ast.TypeName{Name: types.TypeStr(def.Tp.Tp)},
 					IsNotNull: isNotNull(def),
 				}
@@ -237,8 +237,9 @@ func (c *cc) convertCreateTableStmt(n *pcast.CreateTableStmt) ast.Node {
 				}
 			}
 		}
+
 		columnDef := ast.ColumnDef{
-			Colname:   def.Name.String(),
+			Colname:   def.Name.OrigColName(), // def.Name.String(),
 			TypeName:  &ast.TypeName{Name: types.TypeStr(def.Tp.Tp)},
 			IsNotNull: isNotNull(def),
 			Comment:   comment,
@@ -420,7 +421,7 @@ func (c *cc) convertLists(lists [][]pcast.ExprNode) *ast.List {
 func (c *cc) convertParamMarkerExpr(n *driver.ParamMarkerExpr) *ast.ParamRef {
 	// Parameter numbers start at one
 	c.paramCount += 1
-	util.Xiazeminlog("convertParamMarkerExpr", n)
+	util.Xiazeminlog("convertParamMarkerExpr", n, false)
 	return &ast.ParamRef{
 		Number:   c.paramCount,
 		Location: n.Offset,
@@ -499,7 +500,7 @@ func (c *cc) convertUpdateStmt(n *pcast.UpdateStmt) *ast.UpdateStmt {
 		*/
 		if rel.Sel != nil {
 			//rangeVar = rel
-			util.Xiazeminlog("ast in range var", rel)
+			util.Xiazeminlog("ast in range var", rel, false)
 		}
 
 	default:
@@ -830,7 +831,7 @@ func (c *cc) convertJoin(n *pcast.Join) *ast.List {
 		if ta, ok := n.Left.(*pcast.TableSource); ok {
 			c.convertCurrentTableName(ta)
 		}
-		util.Xiazeminlog("n.Left", n.Left)
+		util.Xiazeminlog("n.Left", n.Left, false)
 		tables = append(tables, c.convert(n.Left))
 	}
 	return &ast.List{Items: tables}
@@ -840,7 +841,7 @@ func (c *cc) convertCurrentTableName(n *pcast.TableSource) {
 
 	if tn, ok := n.Source.(*pcast.TableName); ok {
 		c.currentTableName = tn.Name.O
-		util.Xiazeminlog("currentTableName", tn)
+		util.Xiazeminlog("currentTableName", tn, false)
 	}
 }
 
@@ -907,6 +908,7 @@ func (c *cc) convertPatternInExpr(n *pcast.PatternInExpr) ast.Node {
 		return &ast.In{
 			TypeName:  "XiazeminInExprNull",
 			TableName: c.currentTableName,
+			Location:  n.OriginTextPosition(),
 		}
 	}
 
@@ -922,12 +924,12 @@ func (c *cc) convertPatternInExpr(n *pcast.PatternInExpr) ast.Node {
 	if selec, ok := sel.(*ast.SelectStmt); ok {
 		switch selecI := selec.FromClause.Items[0].(type) {
 		case *ast.RangeSubselect:
-			util.Xiazeminlog("*ast.RangeSubselect", selecI)
+			util.Xiazeminlog("*ast.RangeSubselect", selecI, false)
 		case *ast.RangeVar:
-			util.Xiazeminlog("*ast.RangeVar", selecI)
+			util.Xiazeminlog("*ast.RangeVar", selecI, false)
 			table = *selecI.Relname
 		default:
-			util.Xiazeminlog("default", selecI)
+			util.Xiazeminlog("default", selecI, false)
 		}
 	}
 	return &ast.In{
@@ -938,6 +940,7 @@ func (c *cc) convertPatternInExpr(n *pcast.PatternInExpr) ast.Node {
 		TypeName:       "XiazeminInExpr",
 		TableName:      current,
 		ChildTableName: table,
+		Location:       n.OriginTextPosition(),
 	}
 }
 
@@ -1117,6 +1120,17 @@ func (c *cc) convertUseStmt(n *pcast.UseStmt) ast.Node {
 }
 
 func (c *cc) convertValuesExpr(n *pcast.ValuesExpr) ast.Node {
+	return c.convertPatternValuesExpr(n)
+}
+
+func (c *cc) convertPatternValuesExpr(n *pcast.ValuesExpr) ast.Node {
+	//convertPatternInExpr
+	util.Xiazeminlog("convertPatternValuesExpr", n, false)
+	if n == nil {
+		return &ast.Values{
+			Location: n.OriginTextPosition(),
+		}
+	}
 	return todo(n)
 }
 
