@@ -295,8 +295,8 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
-	 } 
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	}
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	row := q.queryRow(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
@@ -330,13 +330,13 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ([]{{.Ret.
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
-	if len({{.Arg.Name}})>0
+	if len({{.Arg.Name}})>0 {
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
-	}
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	}
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	rows, err := q.query(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
@@ -395,8 +395,8 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
-	}
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	}
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	_, err := q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
@@ -465,8 +465,8 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (sql.Resul
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
-	}
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
+	}
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	return q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
