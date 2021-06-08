@@ -279,7 +279,7 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	{
+	if len({{$argNmae}}.{{.Name}})>0{
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -290,10 +290,12 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
+	if len({{.Arg.Name}})>0{
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
+	 } 
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
@@ -317,7 +319,7 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ([]{{.Ret.
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	{
+	if len({{$argNmae}}.{{.Name}}) >0 {
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -328,10 +330,12 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ([]{{.Ret.
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
+	if len({{.Arg.Name}})>0
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
+	}
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
@@ -375,7 +379,7 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	{
+	if len({{$argNmae}}.{{.Name}}) >0{
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -386,10 +390,12 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
+	 if len({{.Arg.Name}})>0{
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
+	}
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
@@ -411,7 +417,7 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (int64, er
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	{
+	if len({{$argNmae}}.{{.Name}}) >0 {
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -443,7 +449,7 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (sql.Resul
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	{
+	if len({{$argNmae}}.{{.Name}}) >0 {
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -454,10 +460,12 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (sql.Resul
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
-	   param:="?"
+	   if len({{.Arg.Name}}) >0 {
+		   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
+	}
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
