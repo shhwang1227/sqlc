@@ -48,6 +48,36 @@ func (v QueryValue) ContainSlice() bool {
 
 var functions map[string]string = make(map[string]string)
 var shouldGenFunctions map[string]bool = make(map[string]bool)
+var shouldGenFunctionsImport map[string]bool = make(map[string]bool)
+
+func (v QueryValue) ShouldGenFunctionsImport() bool {
+	result := false
+	if v.ContainSlice() {
+
+		if v.Struct != nil {
+			for _, f := range v.Struct.Fields {
+				if f.IsSlice {
+					functionName := formatType(f.Type) + "Slice2interface"
+					if _, ok := shouldGenFunctionsImport[functionName]; ok {
+						continue
+					}
+					shouldGenFunctionsImport[functionName] = true
+					result = true
+				}
+			}
+		}
+		if v.IsSlice {
+			functionName := formatType(v.Typ) + "Slice2interface"
+			if _, ok := shouldGenFunctionsImport[functionName]; ok {
+				return false
+			}
+			shouldGenFunctionsImport[functionName] = true
+			result = true
+		}
+
+	}
+	return result
+}
 
 func (v QueryValue) ShouldGenFunctions() bool {
 	result := false

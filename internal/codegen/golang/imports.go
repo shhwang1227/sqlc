@@ -124,13 +124,17 @@ func (i *importer) utilImports() fileImports {
 	uses := func(name string) bool {
 		for _, q := range i.Queries {
 			if q.hasRetType() {
-				if strings.HasPrefix(q.Ret.Type(), name) {
-					return true
+				if q.Ret.ShouldGenFunctionsImport() {
+					if strings.HasPrefix(q.Ret.Type(), name) {
+						return true
+					}
 				}
 			}
 			if !q.Arg.isEmpty() {
-				if strings.HasPrefix(q.Arg.Type(), name) {
-					return true
+				if q.Arg.ShouldGenFunctionsImport() {
+					if strings.HasPrefix(q.Arg.Type(), name) {
+						return true
+					}
 				}
 			}
 		}
