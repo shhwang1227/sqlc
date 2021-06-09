@@ -261,8 +261,6 @@ type {{.Ret.Type}} struct { {{- range .Ret.Struct.Fields}}
 }
 {{end}}
 
-{{.Arg.GenerateFunctions}}
-
 {{if eq $ContainSlice false }}
 {{if eq .Arg.ContainSlice true }}
 {{ $ContainSlice = true }}
@@ -279,7 +277,10 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	if len({{$argNmae}}.{{.Name}})>0{
+	if len({{$argNmae}}.{{.Name}}) <=0{
+		return nil,fmt.Errorf("{{$argNmae}}.{{.Name}} length is invalid")
+	}
+	{
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -290,13 +291,14 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
-	if len({{.Arg.Name}})>0{
+	if len({{.Arg.Name}})<=0 {
+		return nil,fmt.Errorf("{{.Arg.Name}} length is invalid")
+	}
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
-	}
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	row := q.queryRow(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
@@ -319,7 +321,10 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ([]{{.Ret.
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	if len({{$argNmae}}.{{.Name}}) >0 {
+	if len({{$argNmae}}.{{.Name}}) <=0{
+		return nil,fmt.Errorf("{{$argNmae}}.{{.Name}} length is invalid")
+	}
+	{
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -330,13 +335,15 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ([]{{.Ret.
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
-	if len({{.Arg.Name}})>0 {
+	if len({{.Arg.Name}})<=0 {
+		return nil,fmt.Errorf("{{.Arg.Name}} length is invalid")
+	}
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
-	}
+	
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	rows, err := q.query(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
@@ -379,7 +386,10 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	if len({{$argNmae}}.{{.Name}}) >0{
+	if len({{$argNmae}}.{{.Name}}) <=0{
+		return fmt.Errorf("{{$argNmae}}.{{.Name}} length is invalid")
+	}
+	{
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -390,13 +400,14 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) error {
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
-	 if len({{.Arg.Name}})>0{
+	 if len({{.Arg.Name}})<=0{
+		return fmt.Errorf("{{.Arg.Name}} length is invalid")
+	 }
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
-	}
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	_, err := q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
@@ -417,7 +428,10 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (int64, er
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	if len({{$argNmae}}.{{.Name}}) >0 {
+	if len({{$argNmae}}.{{.Name}})  <=0{
+		return nil,fmt.Errorf("{{$argNmae}}.{{.Name}} length is invalid")
+	}
+	 {
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -449,7 +463,10 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (sql.Resul
 	{{$ConstantName}}:={{$ConstantName}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
-	if len({{$argNmae}}.{{.Name}}) >0 {
+	if len({{$argNmae}}.{{.Name}}) <=0{
+		return nil,fmt.Errorf("{{$argNmae}}.{{.Name}} length is invalid")
+	}
+	{
 	param:="?"
 	for i:=0;i<len({{$argNmae}}.{{.Name}})-1;i++{
 	 param+=",?"   
@@ -460,13 +477,15 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (sql.Resul
 	{{- end}}
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
-	   if len({{.Arg.Name}}) >0 {
+	   if len({{.Arg.Name}}) <=0 {
+		   return nil,fmt.Errorf("{{.Arg.Name}} length is invalid")
+	   }
 		   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{
 		param+=",?"   
 	   }
 	   {{.ConstantName}}:=replaceNth({{.ConstantName}}, "(?)", "("+param+")", 1)
-	}
+	
 	{{end -}}
 	{{- if $.EmitPreparedQueries}}
 	return q.exec(ctx, q.{{.FieldName}}, {{.ConstantName}}, {{.Arg.Params}})
@@ -484,7 +503,10 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) (sql.Resul
 package {{.Package}}
 
 import (
-	"strings"
+	{{range imports .SourceName}}
+	{{range .}}{{.}}
+	{{end}}
+	{{end}}
 )
 
 // Replace the nth occurrence of old in s by new.
@@ -503,6 +525,15 @@ func replaceNth(s, old, new string, n int) string {
 	}
 	return s
 }
+
+{{range .GoQueries}}
+{{- if .Arg.ContainSlice -}}
+{{- if .Arg.ShouldGenFunctions -}}
+//{{.SourceName}}   {{.MethodName}}
+{{.Arg.GenerateFunctions}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 {{end}}
 `
 
@@ -569,10 +600,13 @@ func generate(settings config.CombinedSettings, enums []Enum, structs []Struct, 
 
 	output := map[string]string{}
 
-	execute := func(name, templateName string) error {
+	execute := func(name, sourceName, templateName string) error {
 		var b bytes.Buffer
 		w := bufio.NewWriter(&b)
 		tctx.SourceName = name
+		if sourceName != "" {
+			tctx.SourceName = sourceName
+		}
 		err := tmpl.ExecuteTemplate(w, templateName, &tctx)
 		w.Flush()
 		if err != nil {
@@ -589,20 +623,20 @@ func generate(settings config.CombinedSettings, enums []Enum, structs []Struct, 
 		return nil
 	}
 
-	if err := execute("util.go", "utilFile"); err != nil {
+	if err := execute("db.go", "", "dbFile"); err != nil {
 		return nil, err
 	}
-
-	if err := execute("db.go", "dbFile"); err != nil {
-		return nil, err
-	}
-	if err := execute("models.go", "modelsFile"); err != nil {
+	if err := execute("models.go", "", "modelsFile"); err != nil {
 		return nil, err
 	}
 	if golang.EmitInterface {
-		if err := execute("querier.go", "interfaceFile"); err != nil {
+		if err := execute("querier.go", "", "interfaceFile"); err != nil {
 			return nil, err
 		}
+	}
+
+	if err := execute("util.go", "", "utilFile"); err != nil {
+		return nil, err
 	}
 
 	files := map[string]struct{}{}
@@ -611,7 +645,7 @@ func generate(settings config.CombinedSettings, enums []Enum, structs []Struct, 
 	}
 
 	for source := range files {
-		if err := execute(source, "queryFile"); err != nil {
+		if err := execute(source, source, "queryFile"); err != nil {
 			return nil, err
 		}
 	}

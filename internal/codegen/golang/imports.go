@@ -95,6 +95,8 @@ func (i *importer) Imports(filename string) [][]ImportSpec {
 		return mergeImports(i.modelImports())
 	case "querier.go":
 		return mergeImports(i.interfaceImports())
+	case "util.go":
+		return mergeImports(i.utilImports())
 	default:
 		return mergeImports(i.queryImports(filename))
 	}
@@ -116,6 +118,36 @@ var stdlibTypes = map[string]string{
 	"time.Time":        "time",
 	"net.IP":           "net",
 	"net.HardwareAddr": "net",
+}
+
+func (i *importer) utilImports() fileImports {
+	uses := func(name string) bool {
+		for _, q := range i.Queries {
+			if q.hasRetType() {
+				if strings.HasPrefix(q.Ret.Type(), name) {
+					return true
+				}
+			}
+			if !q.Arg.isEmpty() {
+				if strings.HasPrefix(q.Arg.Type(), name) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	std := map[string]struct{}{
+		"strings": {},
+	}
+	if uses("sql.Null") {
+		std["database/sql"] = struct{}{}
+	}
+	stds := make([]ImportSpec, 0, len(std))
+	for path := range std {
+		stds = append(stds, ImportSpec{Path: path})
+	}
+	sort.Slice(stds, func(i, j int) bool { return stds[i].Path < stds[j].Path })
+	return fileImports{Std: stds}
 }
 
 func (i *importer) interfaceImports() fileImports {
@@ -342,6 +374,9 @@ func (i *importer) queryImports(filename string) fileImports {
 		/*if q.Arg.ContainSlice() {
 			std["strings"] = struct{}{}
 		}*/
+		if q.Arg.ContainSlice() {
+			std["fmt"] = struct{}{}
+		}
 	}
 	for typeName, pkg := range stdlibTypes {
 		if uses(typeName) {
