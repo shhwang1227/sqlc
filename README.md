@@ -32,3 +32,18 @@ Sponsors receive priority support via the sqlc Slack organization.
  //go:generate  mockgen -source=./querier.go  -destination=./mock/querier.go
 
  go generate ./... 
+
+ 解决聚合函数返回值是interface{}
+ 必须用下面函数解析的问题
+ ```
+ func ParseInt64(v interface{}) (int64, error) {
+	if v == nil {
+		return 0, nil
+	}
+	raw, ok := v.([]uint8)
+	if !ok {
+		return 0, fmt.Errorf("type assert failed")
+	}
+	return strconv.ParseInt(string(raw), 10, 64)
+}
+```
