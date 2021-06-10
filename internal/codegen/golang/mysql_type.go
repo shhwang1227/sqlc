@@ -81,6 +81,7 @@ func mysqlType(r *compiler.Result, col *compiler.Column, settings config.Combine
 		return "json.RawMessage"
 
 	case "any":
+		//如果是函数，会走到这个分支
 		return "interface{}"
 
 	default:

@@ -32,6 +32,36 @@ func (v QueryValue) IsSliceType() bool {
 	return v.IsSlice
 }
 
+func (v QueryValue) GetDefaultValueByType() string {
+
+	if v.Struct != nil {
+		return v.Struct.Name + "{}"
+	}
+
+	if v.Typ != "" {
+
+		switch v.Typ {
+		case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
+			return "0"
+		case "float32", "float64":
+			return "0"
+		case "string":
+			return "\"\""
+		case "bool":
+			return "false"
+		case "interface{}":
+			return "nil"
+		}
+		if strings.HasPrefix(v.Typ, "sql.Null") {
+			return v.Typ + "{}"
+		}
+		if strings.HasPrefix(v.Typ, "*") || strings.HasPrefix(v.Typ, "[]") {
+			return "nil"
+		}
+	}
+	return "nil"
+}
+
 func (v QueryValue) ContainSlice() bool {
 	if v.Struct != nil {
 		for _, f := range v.Struct.Fields {

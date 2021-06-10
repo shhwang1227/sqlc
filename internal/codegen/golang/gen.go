@@ -275,10 +275,11 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 	{{$ConstantName := .ConstantName}}
 	{{$argNmae := .Arg.Name}}
 	{{$ConstantName}}:={{$ConstantName}}
+	{{$DefaultValueByType := .Ret.GetDefaultValueByType}}
 	{{- range .Arg.Struct.Fields}}
 	{{if eq .IsSlice true}}
 	if len({{$argNmae}}.{{.Name}}) <=0{
-		return nil,fmt.Errorf("{{$argNmae}}.{{.Name}} length is invalid")
+		return {{$DefaultValueByType}},fmt.Errorf("{{$argNmae}}.{{.Name}} length is invalid")
 	}
 	{
 	param:="?"
@@ -292,7 +293,7 @@ func (q *Queries) {{.MethodName}}(ctx context.Context, {{.Arg.Pair}}) ({{.Ret.Ty
 	{{- end}}
 	{{ if eq .Arg.IsSliceType true}}
 	if len({{.Arg.Name}})<=0 {
-		return nil,fmt.Errorf("{{.Arg.Name}} length is invalid")
+		return {{.Ret.GetDefaultValueByType}},fmt.Errorf("{{.Arg.Name}} length is invalid")
 	}
 	   param:="?"
 	   for i:=0;i<len({{.Arg.Name}})-1;i++{

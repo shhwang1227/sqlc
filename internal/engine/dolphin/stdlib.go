@@ -207,6 +207,16 @@ func defaultSchema(name string) *catalog.Schema {
 			Name: "AVG",
 			Args: []*catalog.Argument{
 				{
+					//double
+					Type: &ast.TypeName{Name: "double"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "double"},
+		},
+		{
+			Name: "AVG",
+			Args: []*catalog.Argument{
+				{
 					Type: &ast.TypeName{Name: "any"},
 				},
 			},
@@ -1136,6 +1146,42 @@ func defaultSchema(name string) *catalog.Schema {
 				},
 			},
 			ReturnType: &ast.TypeName{Name: "any"},
+		},
+		{
+			Name: "IFNULL",
+			Args: []*catalog.Argument{
+				{
+					Type: &ast.TypeName{Name: "any"},
+				},
+				{
+					Type: &ast.TypeName{Name: "int"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "int"},
+		},
+		{
+			Name: "IFNULL",
+			Args: []*catalog.Argument{
+				{
+					Type: &ast.TypeName{Name: "any"},
+				},
+				{
+					Type: &ast.TypeName{Name: "double"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "double"},
+		},
+		{
+			Name: "IFNULL",
+			Args: []*catalog.Argument{
+				{
+					Type: &ast.TypeName{Name: "any"},
+				},
+				{
+					Type: &ast.TypeName{Name: "string"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "string"},
 		},
 		{
 			Name: "IFNULL",
@@ -2118,6 +2164,36 @@ func defaultSchema(name string) *catalog.Schema {
 			Name: "MAX",
 			Args: []*catalog.Argument{
 				{
+					//int
+					Type: &ast.TypeName{Name: "int"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "int"},
+		},
+		{
+			Name: "MAX",
+			Args: []*catalog.Argument{
+				{
+					//double
+					Type: &ast.TypeName{Name: "double"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "double"},
+		},
+		{
+			Name: "MAX",
+			Args: []*catalog.Argument{
+				{
+					//string
+					Type: &ast.TypeName{Name: "string"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "string"},
+		},
+		{
+			Name: "MAX",
+			Args: []*catalog.Argument{
+				{
 					Type: &ast.TypeName{Name: "any"},
 				},
 			},
@@ -2263,6 +2339,36 @@ func defaultSchema(name string) *catalog.Schema {
 				},
 			},
 			ReturnType: &ast.TypeName{Name: "text"},
+		},
+		{
+			Name: "MIN",
+			Args: []*catalog.Argument{
+				{
+					//int
+					Type: &ast.TypeName{Name: "int"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "int"},
+		},
+		{
+			Name: "MIN",
+			Args: []*catalog.Argument{
+				{
+					//double
+					Type: &ast.TypeName{Name: "double"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "double"},
+		},
+		{
+			Name: "MIN",
+			Args: []*catalog.Argument{
+				{
+					//string
+					Type: &ast.TypeName{Name: "string"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "string"},
 		},
 		{
 			Name: "MIN",
@@ -5174,6 +5280,26 @@ func defaultSchema(name string) *catalog.Schema {
 				},
 			},
 			ReturnType: &ast.TypeName{Name: "time"},
+		},
+		{
+			Name: "SUM",
+			Args: []*catalog.Argument{
+				{
+					//int
+					Type: &ast.TypeName{Name: "int"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "int"},
+		},
+		{
+			Name: "SUM",
+			Args: []*catalog.Argument{
+				{
+					//double
+					Type: &ast.TypeName{Name: "double"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "double"},
 		},
 		{
 			Name: "SUM",
