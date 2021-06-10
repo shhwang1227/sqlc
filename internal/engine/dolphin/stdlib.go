@@ -1154,6 +1154,18 @@ func defaultSchema(name string) *catalog.Schema {
 					Type: &ast.TypeName{Name: "any"},
 				},
 				{
+					Type: &ast.TypeName{Name: "bigint"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "bigint"},
+		},
+		{
+			Name: "IFNULL",
+			Args: []*catalog.Argument{
+				{
+					Type: &ast.TypeName{Name: "any"},
+				},
+				{
 					Type: &ast.TypeName{Name: "int"},
 				},
 			},
@@ -2164,6 +2176,16 @@ func defaultSchema(name string) *catalog.Schema {
 			Name: "MAX",
 			Args: []*catalog.Argument{
 				{
+					//bigint
+					Type: &ast.TypeName{Name: "bigint"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "bigint"},
+		},
+		{
+			Name: "MAX",
+			Args: []*catalog.Argument{
+				{
 					//int
 					Type: &ast.TypeName{Name: "int"},
 				},
@@ -2339,6 +2361,16 @@ func defaultSchema(name string) *catalog.Schema {
 				},
 			},
 			ReturnType: &ast.TypeName{Name: "text"},
+		},
+		{
+			Name: "MIN",
+			Args: []*catalog.Argument{
+				{
+					//bigint
+					Type: &ast.TypeName{Name: "bigint"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "bigint"},
 		},
 		{
 			Name: "MIN",
@@ -5280,6 +5312,16 @@ func defaultSchema(name string) *catalog.Schema {
 				},
 			},
 			ReturnType: &ast.TypeName{Name: "time"},
+		},
+		{
+			Name: "SUM",
+			Args: []*catalog.Argument{
+				{
+					//bigint
+					Type: &ast.TypeName{Name: "bigint"},
+				},
+			},
+			ReturnType: &ast.TypeName{Name: "bigint"},
 		},
 		{
 			Name: "SUM",
