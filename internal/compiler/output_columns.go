@@ -6,8 +6,10 @@ import (
 
 	"github.com/xiazemin/sqlc/internal/sql/ast"
 	"github.com/xiazemin/sqlc/internal/sql/astutils"
+	"github.com/xiazemin/sqlc/internal/sql/catalog"
 	"github.com/xiazemin/sqlc/internal/sql/lang"
 	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
+	"github.com/xiazemin/sqlc/internal/util"
 )
 
 func hasStarRef(cf *ast.ColumnRef) bool {
@@ -150,14 +152,175 @@ func outputColumns(qc *QueryCatalog, node ast.Node) ([]*Column, error) {
 			cols = append(cols, columns...)
 
 		case *ast.FuncCall:
+			//这里解析函数调用
+			util.Xiazeminlog("ast.FuncCall", n, false)
+			util.Xiazeminlog("ast.FuncCall tables ", tables, false)
+			/*
+				{
+					"Func": {
+						"Catalog": "",
+						"Schema": "",
+						"Name": "ifnull"
+					},
+					"Funcname": {
+						"Items": [
+							{
+								"Str": "ifnull"
+							}
+						]
+					},
+					"Args": {
+						"Items": [
+							{
+								"Func": {
+									"Catalog": "",
+									"Schema": "",
+									"Name": "sum"
+								},
+								"Funcname": {
+									"Items": [
+										{
+											"Str": "sum"
+										}
+									]
+								},
+								"Args": {
+									"Items": [
+										{
+											"Name": "",
+											"Fields": {
+												"Items": [
+													{
+														"Str": "size"
+													}
+												]
+											},
+											"Location": 0,
+											"TableName": ""
+										}
+									]
+								},
+								"AggOrder": {
+									"Items": null
+								},
+								"AggFilter": null,
+								"AggWithinGroup": false,
+								"AggStar": false,
+								"AggDistinct": false,
+								"FuncVariadic": false,
+								"Over": null,
+								"Location": 0
+							},
+							{
+								"Val": {
+									"Str": ""
+								},
+								"Location": 0
+							}
+						]
+					},
+					"AggOrder": null,
+					"AggFilter": null,
+					"AggWithinGroup": false,
+					"AggStar": false,
+					"AggDistinct": false,
+					"FuncVariadic": false,
+					"Over": null,
+					"Location": 981
+				}
+			*/
 			rel := n.Func
-			name := rel.Name
+			name := rel.Name //这里直接用方法的名字也行，和sql保持一致
 			if res.Name != nil {
 				name = *res.Name
 			}
-			fun, err := qc.catalog.ResolveFuncCall(n)
+			var tablse1 []*catalog.Table
+			for _, tab := range tables {
+				var col []*catalog.Column
+				for _, c := range tab.Columns {
+					col = append(col, &catalog.Column{
+						Name: c.Name,
+						Type: ast.TypeName{
+							Name: c.DataType,
+						},
+						IsNotNull: c.NotNull,
+						IsArray:   c.IsArray,
+						Comment:   c.Comment,
+						Length:    c.Length,
+					})
+				}
+
+				tablse1 = append(tablse1, &catalog.Table{
+					Rel:     tab.Rel,
+					Columns: col,
+				})
+			}
+
+			fun, notNull, err := qc.catalog.ResolveFuncCall(n, tablse1)
+			util.Xiazeminlog("ResolveFuncCall", fun, false)
+			util.Xiazeminlog("ResolveFuncCall", notNull, false)
+			/*
+				{
+					"Name": "IFNULL",
+					"Args": [
+						{
+							"Name": "",
+							"Type": {
+								"Catalog": "",
+								"Schema": "",
+								"Name": "any",
+								"Names": null,
+								"TypeOid": 0,
+								"Setof": false,
+								"PctType": false,
+								"Typmods": null,
+								"Typemod": 0,
+								"ArrayBounds": null,
+								"Location": 0
+							},
+							"HasDefault": false,
+							"Mode": 0
+						},
+						{
+							"Name": "",
+							"Type": {
+								"Catalog": "",
+								"Schema": "",
+								"Name": "bigint",
+								"Names": null,
+								"TypeOid": 0,
+								"Setof": false,
+								"PctType": false,
+								"Typmods": null,
+								"Typemod": 0,
+								"ArrayBounds": null,
+								"Location": 0
+							},
+							"HasDefault": false,
+							"Mode": 0
+						}
+					],
+					"ReturnType": {
+						"Catalog": "",
+						"Schema": "",
+						"Name": "bigint",
+						"Names": null,
+						"TypeOid": 0,
+						"Setof": false,
+						"PctType": false,
+						"Typmods": null,
+						"Typemod": 0,
+						"ArrayBounds": null,
+						"Location": 0
+					},
+					"Comment": "",
+					"Desc": ""
+				}
+			*/
+			util.Xiazeminlog("\n \n ResolveFuncCall name ", []string{name, rel.Name}, false)
 			if err == nil {
-				cols = append(cols, &Column{Name: name, DataType: dataType(fun.ReturnType), NotNull: true})
+				//这里的NotNull 不能直接为true，否则会报0 sql: Scan error on column index 0, name "sum(size)": converting NULL to int64 is unsupported
+				cols = append(cols, &Column{Name: name, DataType: dataType(fun.ReturnType), NotNull: notNull})
 			} else {
 				cols = append(cols, &Column{Name: name, DataType: "any"})
 			}

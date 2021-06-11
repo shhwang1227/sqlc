@@ -183,7 +183,7 @@ func buildQueries(r *compiler.Result, settings config.CombinedSettings, structs 
 			c := query.Columns[0]
 			gq.Ret = QueryValue{
 				Name:    columnName(c, 0),
-				Typ:     goType(r, c, settings),
+				Typ:     goType(r, c, settings), //获取类型从这里进入
 				IsSlice: isSlice(c),
 			}
 		} else if len(query.Columns) > 1 {

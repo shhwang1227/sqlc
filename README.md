@@ -47,3 +47,6 @@ Sponsors receive priority support via the sqlc Slack organization.
 	return strconv.ParseInt(string(raw), 10, 64)
 }
 ```
+
+//解决null 问题
+sql: Scan error on column index 0, name "sum(size)": converting NULL to int64 is unsupported

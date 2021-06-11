@@ -50,9 +50,12 @@ func resolveCatalogValuesRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []pa
 		aliasMap[*rv.Alias.Aliasname] = fqn
 	}
 
+	var catalogTables []*catalog.Table
 	typeMap := map[string]map[string]map[string]*catalog.Column{}
 	for _, fqn := range tables {
 		table, err := c.GetTable(fqn)
+		catalogTables = append(catalogTables, &table)
+		util.Xiazeminlog(" c.GetTable(fqn)", table, false)
 		if err != nil {
 			continue
 		}
@@ -179,7 +182,7 @@ func resolveCatalogValuesRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []pa
 			}
 
 		case *ast.FuncCall:
-			fun, err := c.ResolveFuncCall(n)
+			fun, notNull, err := c.ResolveFuncCall(n, catalogTables)
 			if err != nil {
 				// Synthesize a function on the fly to avoid returning with an error
 				// for an unknown Postgres function (e.g. defined in an extension)
@@ -236,6 +239,7 @@ func resolveCatalogValuesRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []pa
 						Column: &Column{
 							Name:     parameterName(ref.ref.Number, defaultName),
 							DataType: "any",
+							NotNull:  notNull,
 						},
 					})
 					continue
@@ -266,7 +270,7 @@ func resolveCatalogValuesRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []pa
 					Column: &Column{
 						Name:     parameterName(ref.ref.Number, paramName),
 						DataType: dataType(paramType),
-						NotNull:  true,
+						NotNull:  notNull,
 					},
 				})
 			}
@@ -444,11 +448,14 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 	}
 
 	typeMap := map[string]map[string]map[string]*catalog.Column{}
+	var catalogTables []*catalog.Table
 	for _, fqn := range tables {
 		table, err := c.GetTable(fqn)
 		if err != nil {
 			continue
 		}
+		catalogTables = append(catalogTables, &table)
+
 		if _, exists := typeMap[fqn.Schema]; !exists {
 			typeMap[fqn.Schema] = map[string]map[string]*catalog.Column{}
 		}
@@ -572,7 +579,30 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 			}
 
 		case *ast.FuncCall:
-			fun, err := c.ResolveFuncCall(n)
+			/*
+				var tablse1 []*catalog.Table
+				for _, tab := range tables {
+					var col []*catalog.Column
+					for _, c := range tab.Columns {
+						col = append(col, &catalog.Column{
+							Name: c.Name,
+							Type: ast.TypeName{
+								Name: c.DataType,
+							},
+							IsNotNull: c.NotNull,
+							IsArray:   c.IsArray,
+							Comment:   c.Comment,
+							Length:    c.Length,
+						})
+					}
+
+					tablse1 = append(tablse1, &catalog.Table{
+						Rel:     tab.Rel,
+						Columns: col,
+					})
+				}
+			*/
+			fun, notNull, err := c.ResolveFuncCall(n, catalogTables)
 			if err != nil {
 				// Synthesize a function on the fly to avoid returning with an error
 				// for an unknown Postgres function (e.g. defined in an extension)
@@ -629,6 +659,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 						Column: &Column{
 							Name:     parameterName(ref.ref.Number, defaultName),
 							DataType: "any",
+							NotNull:  notNull,
 						},
 					})
 					continue
@@ -659,7 +690,7 @@ func resolveCatalogRefs(c *catalog.Catalog, rvs []*ast.RangeVar, args []paramRef
 					Column: &Column{
 						Name:     parameterName(ref.ref.Number, paramName),
 						DataType: dataType(paramType),
-						NotNull:  true,
+						NotNull:  notNull,
 					},
 				})
 			}

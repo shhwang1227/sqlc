@@ -58,7 +58,7 @@ func (v *funcCallVisitor) Visit(node ast.Node) astutils.Visitor {
 		}
 	}
 
-	fun, err := v.catalog.ResolveFuncCall(call)
+	fun, _, err := v.catalog.ResolveFuncCall(call, nil)
 	if fun != nil || errors.Is(err, sqlerr.NotFound) {
 		return v
 	}

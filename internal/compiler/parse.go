@@ -119,6 +119,7 @@ func (c *Compiler) parseQuery(stmt ast.Node, src string, o opts.Parser) (*Query,
 		return nil, err
 	}
 	cols, err := outputColumns(qc, raw.Stmt)
+	util.Xiazeminlog("outputColumns", cols, false)
 
 	if err != nil {
 		return nil, err
