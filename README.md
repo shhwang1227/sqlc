@@ -50,3 +50,28 @@ Sponsors receive priority support via the sqlc Slack organization.
 
 //解决null 问题
 sql: Scan error on column index 0, name "sum(size)": converting NULL to int64 is unsupported
+
+问题1:
+如果字段定义了default null 返回的是sql.Nullxxx
+
+问题2：
+如果 字段定义了 NOT NULL，但是没有命中记录
+返回null怎么处理，怎么扫描？
+所以安全起见 应该都是返回sql.Nullxxx
+
+
+
+使用聚合函数的情况下
+如果NOT NULL，没有命中会返回 NULL ,且走了索引才会，in 不会
+             命中了 返回默认值
+如果DEFAULT NULL，但是没有插入数据，且没有命中会返回NULL  用了sql.null不会报错
+                            命中了 返回NULL
+              如果插入数据了，没有命中会返回NULL
+                            命中了 返回NULL
+
+//安全起见
+1，规范写ifnull 0 
+2，聚合函数都返回sqlNullxxx    √  这个更安全，拿到0值更符合预期
+
+
+

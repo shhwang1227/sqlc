@@ -39,6 +39,8 @@ func (c *Catalog) getaggColumn(tab *Table, inArgs *ast.List) *Column {
 							continue
 						}
 						if c.Name == field.Str {
+							//将聚合函数的返回值都改成sql.Null类型
+							c.IsNotNull = false
 							return c
 						}
 					}
