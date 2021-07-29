@@ -199,6 +199,10 @@ func (v QueryValue) Type() string {
 func formatType(typ string) string {
 	if len(typ) > 4 && typ[:4] == "sql." {
 		return typ[4:]
+	} else if len(typ) > 6 && typ[:6] == "utils." {
+		return typ[6:]
+	} else if strings.HasPrefix(typ, "*") {
+		return typ[1:]
 	}
 	return typ
 }
