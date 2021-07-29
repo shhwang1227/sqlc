@@ -74,4 +74,12 @@ sql: Scan error on column index 0, name "sum(size)": converting NULL to int64 is
 2，聚合函数都返回sqlNullxxx    √  这个更安全，拿到0值更符合预期
 
 
+//修复bug
+如果 有两个IN ，第一个参数长度是 1 时候，会把第二个参数替换到第一个位置
+IN (?) AND cond IN (?)
+应该被替换成
+IN (?) AND cond IN (?,?,?)
+实际替换成
+IN (?,?,?) AND cond IN (?)
+
 
