@@ -1,9 +1,9 @@
 package compiler
 
 import (
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/astutils"
-	"github.com/xiazemin/sqlc/internal/util"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/astutils"
+	"github.com/shhwang1227/sqlc/internal/util"
 )
 
 func findParameters(root ast.Node) []paramRef {

@@ -3,7 +3,7 @@ package validate
 import (
 	"fmt"
 
-	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
 )
 
 func Cmd(n ast.Node, name, cmd string) error {

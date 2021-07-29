@@ -11,7 +11,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/xiazemin/sqlc/internal/cmd"
+	"github.com/shhwang1227/sqlc/internal/cmd"
 )
 
 func TestExamples(t *testing.T) {

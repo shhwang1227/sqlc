@@ -3,8 +3,8 @@ package catalog
 import (
 	"strings"
 
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/sqlerr"
 )
 
 func stringSlice(list *ast.List) []string {

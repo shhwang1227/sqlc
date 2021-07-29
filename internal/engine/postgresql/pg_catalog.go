@@ -3,8 +3,8 @@
 package postgresql
 
 import (
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
 )
 
 func genPGCatalog() *catalog.Schema {

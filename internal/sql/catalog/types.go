@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/sqlerr"
 )
 
 func (c *Catalog) createEnum(stmt *ast.CreateEnumStmt) error {

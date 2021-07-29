@@ -1,3 +1,4 @@
+//go:build examples
 // +build examples
 
 package authors
@@ -7,7 +8,7 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/xiazemin/sqlc/internal/sqltest"
+	"github.com/shhwang1227/sqlc/internal/sqltest"
 )
 
 func TestAuthors(t *testing.T) {

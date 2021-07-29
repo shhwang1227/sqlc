@@ -3,12 +3,12 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/xiazemin/sqlc/internal/config"
-	"github.com/xiazemin/sqlc/internal/engine/dolphin"
-	"github.com/xiazemin/sqlc/internal/engine/postgresql"
-	"github.com/xiazemin/sqlc/internal/engine/sqlite"
-	"github.com/xiazemin/sqlc/internal/opts"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/config"
+	"github.com/shhwang1227/sqlc/internal/engine/dolphin"
+	"github.com/shhwang1227/sqlc/internal/engine/postgresql"
+	"github.com/shhwang1227/sqlc/internal/engine/sqlite"
+	"github.com/shhwang1227/sqlc/internal/opts"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
 )
 
 type Compiler struct {

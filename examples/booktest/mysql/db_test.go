@@ -1,3 +1,4 @@
+//go:build examples
 // +build examples
 
 package booktest
@@ -7,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xiazemin/sqlc/internal/sqltest"
+	"github.com/shhwang1227/sqlc/internal/sqltest"
 )
 
 func TestBooks(t *testing.T) {
@@ -54,7 +55,7 @@ func TestBooks(t *testing.T) {
 		AuthorID:  int32(authorID),
 		Isbn:      "2",
 		Title:     "the second book",
-		BookType: BooksBookTypeFICTION ,
+		BookType:  BooksBookTypeFICTION,
 		Yr:        2016,
 		Available: now,
 		Tags:      "cool,unique",

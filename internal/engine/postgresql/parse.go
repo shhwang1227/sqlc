@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package postgresql
@@ -12,8 +13,8 @@ import (
 	pg "github.com/lfittl/pg_query_go"
 	nodes "github.com/lfittl/pg_query_go/nodes"
 
-	"github.com/xiazemin/sqlc/internal/metadata"
-	"github.com/xiazemin/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/metadata"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
 )
 
 func stringSlice(list nodes.List) []string {

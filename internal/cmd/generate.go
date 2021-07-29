@@ -10,15 +10,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/xiazemin/sqlc/cmd/generator"
-	"github.com/xiazemin/sqlc/internal/codegen/golang"
-	"github.com/xiazemin/sqlc/internal/codegen/kotlin"
-	"github.com/xiazemin/sqlc/internal/compiler"
-	"github.com/xiazemin/sqlc/internal/config"
-	"github.com/xiazemin/sqlc/internal/debug"
-	"github.com/xiazemin/sqlc/internal/multierr"
-	"github.com/xiazemin/sqlc/internal/opts"
-	"github.com/xiazemin/sqlc/internal/util"
+	"github.com/shhwang1227/sqlc/cmd/generator"
+	"github.com/shhwang1227/sqlc/internal/codegen/golang"
+	"github.com/shhwang1227/sqlc/internal/codegen/kotlin"
+	"github.com/shhwang1227/sqlc/internal/compiler"
+	"github.com/shhwang1227/sqlc/internal/config"
+	"github.com/shhwang1227/sqlc/internal/debug"
+	"github.com/shhwang1227/sqlc/internal/multierr"
+	"github.com/shhwang1227/sqlc/internal/opts"
+	"github.com/shhwang1227/sqlc/internal/util"
 )
 
 const errMessageNoVersion = `The configuration file must have a version number.

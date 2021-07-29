@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
-	"github.com/xiazemin/sqlc/internal/util"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/sqlerr"
+	"github.com/shhwang1227/sqlc/internal/util"
 )
 
 func (c *Catalog) schemasToSearch(ns string) []string {

@@ -5,13 +5,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/xiazemin/sqlc/internal/codegen"
-	"github.com/xiazemin/sqlc/internal/compiler"
-	"github.com/xiazemin/sqlc/internal/config"
-	"github.com/xiazemin/sqlc/internal/core"
-	"github.com/xiazemin/sqlc/internal/inflection"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
-	"github.com/xiazemin/sqlc/internal/util"
+	"github.com/shhwang1227/sqlc/internal/codegen"
+	"github.com/shhwang1227/sqlc/internal/compiler"
+	"github.com/shhwang1227/sqlc/internal/config"
+	"github.com/shhwang1227/sqlc/internal/core"
+	"github.com/shhwang1227/sqlc/internal/inflection"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/util"
 )
 
 func buildEnums(r *compiler.Result, settings config.CombinedSettings) []Enum {

@@ -9,15 +9,15 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/xiazemin/sqlc/internal/metadata"
-	"github.com/xiazemin/sqlc/internal/migrations"
-	"github.com/xiazemin/sqlc/internal/multierr"
-	"github.com/xiazemin/sqlc/internal/opts"
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
-	"github.com/xiazemin/sqlc/internal/sql/sqlerr"
-	"github.com/xiazemin/sqlc/internal/sql/sqlpath"
-	"github.com/xiazemin/sqlc/internal/util"
+	"github.com/shhwang1227/sqlc/internal/metadata"
+	"github.com/shhwang1227/sqlc/internal/migrations"
+	"github.com/shhwang1227/sqlc/internal/multierr"
+	"github.com/shhwang1227/sqlc/internal/opts"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/sql/sqlerr"
+	"github.com/shhwang1227/sqlc/internal/sql/sqlpath"
+	"github.com/shhwang1227/sqlc/internal/util"
 )
 
 // TODO: Rename this interface Engine

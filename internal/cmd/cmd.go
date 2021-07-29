@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/pflag"
 	yaml "gopkg.in/yaml.v3"
 
-	"github.com/xiazemin/sqlc/internal/config"
+	"github.com/shhwang1227/sqlc/internal/config"
 )
 
 // Do runs the command logic.

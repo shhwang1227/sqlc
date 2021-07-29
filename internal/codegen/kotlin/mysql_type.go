@@ -3,10 +3,10 @@ package kotlin
 import (
 	"log"
 
-	"github.com/xiazemin/sqlc/internal/compiler"
-	"github.com/xiazemin/sqlc/internal/config"
-	"github.com/xiazemin/sqlc/internal/debug"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/compiler"
+	"github.com/shhwang1227/sqlc/internal/config"
+	"github.com/shhwang1227/sqlc/internal/debug"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
 )
 
 func mysqlType(r *compiler.Result, col *compiler.Column, settings config.CombinedSettings) (string, bool) {

@@ -6,14 +6,14 @@ sqlc generates **type-safe code** from SQL. Here's how it works:
 1. You run sqlc to generate code with type-safe interfaces to those queries.
 1. You write application code that calls the generated code.
 1. support in syntax
-Check out [an interactive example](https://github.com/xiazemin/sqlc_study) to see it in action.
+Check out [an interactive example](https://github.com/shhwang1227/sqlc_study) to see it in action.
 
 
 #安装
- go get -u github.com/xiazemin/sqlc
- go get -u github.com/xiazemin/sqlc/cmd/sqlc
+ go get -u github.com/shhwang1227/sqlc
+ go get -u github.com/shhwang1227/sqlc/cmd/sqlc
 #使用
-实例：https://github.com/xiazemin/sqlc_study
+实例：https://github.com/shhwang1227/sqlc_study
 
 ## Sponsors
 

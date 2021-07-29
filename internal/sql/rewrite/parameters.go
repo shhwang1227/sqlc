@@ -3,11 +3,11 @@ package rewrite
 import (
 	"fmt"
 
-	"github.com/xiazemin/sqlc/internal/config"
-	"github.com/xiazemin/sqlc/internal/source"
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/astutils"
-	"github.com/xiazemin/sqlc/internal/sql/named"
+	"github.com/shhwang1227/sqlc/internal/config"
+	"github.com/shhwang1227/sqlc/internal/source"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/astutils"
+	"github.com/shhwang1227/sqlc/internal/sql/named"
 )
 
 // Given an AST node, return the string representation of names

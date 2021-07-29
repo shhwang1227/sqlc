@@ -14,8 +14,8 @@ import (
 
 	pgx "github.com/jackc/pgx/v4"
 
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
 )
 
 // https://stackoverflow.com/questions/25308765/postgresql-how-can-i-inspect-which-arguments-to-a-procedure-have-a-default-valu
@@ -64,8 +64,8 @@ const catalogTmpl = `
 package {{.Pkg}}
 
 import (
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
 )
 
 func {{.Name}}() *catalog.Schema {
@@ -100,8 +100,8 @@ const loaderFuncTmpl = `
 package postgresql
 
 import (
-	"github.com/xiazemin/sqlc/internal/engine/postgresql/contrib"
-	"github.com/xiazemin/sqlc/internal/sql/catalog"
+	"github.com/shhwang1227/sqlc/internal/engine/postgresql/contrib"
+	"github.com/shhwang1227/sqlc/internal/sql/catalog"
 )
 
 func loadExtension(name string) *catalog.Schema {

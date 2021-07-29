@@ -3,7 +3,7 @@
 package override
 
 import (
-	"github.com/xiazemin/sqlc-testdata/pkg"
+	"github.com/shhwang1227/sqlc-testdata/pkg"
 	"github.com/lib/pq"
 )
 

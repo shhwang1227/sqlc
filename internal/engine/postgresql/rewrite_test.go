@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xiazemin/sqlc/internal/sql/ast"
-	"github.com/xiazemin/sqlc/internal/sql/astutils"
+	"github.com/shhwang1227/sqlc/internal/sql/ast"
+	"github.com/shhwang1227/sqlc/internal/sql/astutils"
 
 	"github.com/google/go-cmp/cmp"
 )

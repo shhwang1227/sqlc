@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xiazemin/sqlc/internal/metadata"
+	"github.com/shhwang1227/sqlc/internal/metadata"
 )
 
 type QueryValue struct {
